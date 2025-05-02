@@ -484,13 +484,13 @@ const Index = () => {
               onClick={() => setActiveFilter('certification')} 
               colorClass="bg-blue-500/20"
             />
-            <FilterButton 
+            {/* <FilterButton 
               label="Achievements" 
               count={counts.achievement}
               isActive={activeFilter === 'achievement'} 
               onClick={() => setActiveFilter('achievement')} 
               colorClass="bg-amber-500/20"
-            />
+            /> */}
             <FilterButton 
               label="Publications" 
               count={counts.publication}
@@ -731,6 +731,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+      <footer className="text-center text-sm text-muted-foreground py-6">
+      © {new Date().getFullYear()} Garv Kamra. All rights reserved.
+    </footer>
     </div>
   );
 };
