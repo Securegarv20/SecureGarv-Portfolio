@@ -207,7 +207,7 @@ const Index = () => {
                     2000,
                     "I'm an Arduino Trainer",
                     2000,
-                    "I'm aStartUp Founder",
+                    "I'm a StartUp Founder",
                     2000,
                   ]}
                   wrapper="span"
