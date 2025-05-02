@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "company": "NeevCode Community",
+    "position": "Community Founder & Lead",
+    "period": "Mar 2025 - Present",
+    "description": "Founded and currently working on building a tech-focused student community that offers learning events, CTF challenges, workshops, and a space for students to connect, learn, and grow."
+  },
+  {
+    "id": 2,
+    "company": "NeevCode",
+    "position": "Founder & CEO",
+    "period": "Jan 2024 - Present",
+    "description": "Founded and manage NeevCode, a personalized learning platform connecting students through peer-to-peer education, offering customized curriculums and mentorship."
+  },
+  {
+    "id": 3,
+    "company": "SecurityBot",
+    "position": "Content Writer - Cybersecurity",
+    "period": "Dec 2024 - Mar 2025",
+    "description": "Created educational content on cybersecurity topics like network security and ethical hacking."
+  },
+  {
+    "id": 4,
+    "company": "Cyber & Forensics Security Solutions (CFSS)",
+    "position": "Cybersecurity & Ethical Hacking Intern",
+    "period": "Jun 2024 - Jul 2024",
+    "description": "Performed reconnaissance, vulnerability analysis, and simulated exploitation in a test environment."
+  },
+  {
+    "id": 5,
+    "company": "KV, Bengaluru Region",
+    "position": "Cybersecurity Awareness Trainer",
+    "period": "Nov 2024 - Dec 2024",
+    "description": "Delivered cybersecurity training on phishing, social engineering, and safe digital practices to high school students."
+  },
+  {
+    "id": 6,
+    "company": "Online Robotics Teaching",
+    "position": "Instructor",
+    "period": "Oct 2020 - Jul 2022",
+    "description": "Designed and delivered online robotics courses, teaching Arduino and sensor integration to students."
+  }
+]

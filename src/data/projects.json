@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "title": "NeevCode Website",
+    "description": "Complete E-Commerece website for my Startup NeevCode",
+    "image": "/NeevCode.png",
+    "tags": ["NextJs", "CSS"],
+    "github": "",
+    "liveDemo": "https://neevcode.com/"
+  },
+  {
+    "id": 2,
+    "title": "NeevCode-Community Website",
+    "description": "Website for the NeevCode Community, a space for students to collaborate, learn, and grow through challenges and events.",
+    "image": "/community.png",
+    "tags": ["Vite", "TailwindCSS"],
+    "github": "",
+    "liveDemo": "https://community.neevcode.com/"
+  },
+  {
+    "id": 3,
+    "title": "ACM Student Chapter Website",
+    "description": "Website for the ACM Student Chapter at Jain (Deemed-to-be) University, featuring events, workshops, and student resources.",
+    "image": "/acm.png",
+    "tags": ["WordPress"],
+    "github": "",
+    "liveDemo": "https://jain.hosting.acm.org/s"
+  },
+  {
+    "id": 4,
+    "title": "ForensicInstaller",
+    "description": "ForensicInstaller is a simple Bash script designed to automate the installation of essential digital forensics tools for Kali Linux.",
+    "image": "/ForensicInstaller.png",
+    "tags": ["Bash"],
+    "github": "https://github.com/Securegarv20/ForensicInstaller.git"
+  },
+  {
+    "id": 5,
+    "title": "Landing Page & Dashboard to track dropshipping Products",
+    "description": "",
+    "image": "/TrendyDrops.png",
+    "tags": ["HTML", "CSS", "JavaScript"],
+    "github": "https://github.com/Securegarv20/dropshipping-website-v2.git",
+    "liveDemo": "https://securegarv20.github.io/dropshipping-website-v2/index.html"
+  },
+  {
+    "id": 6,
+    "title": "YouTube Playlist Downloader",
+    "description": "This is a simple web application built with Python and Flask for downloading YouTube playlists.",
+    "image": "/YouTube_Playlist_Downloader.png",
+    "tags": ["Python", "HTML", "CSS"],
+    "github": "https://github.com/Securegarv20/youtube-playlist-downloader.git",
+    "liveDemo": ""
+  },
+  {
+    "id": 7,
+    "title": "TechnoFusion 2k24 - Official Registration Page",
+    "description": "This project was developed to manage participant registrations for TechnoFusion 2k24, an intercollegiate fest organized by ACM Student Chapter Jain (Deemed-to-be University).",
+    "image": "https://github.com/Securegarv20/TechnoFusion-2k24-Registration-form/raw/main/static/styles/event-logo.png",
+    "tags": ["JavaScript", "HTML", "CSS", "Python"],
+    "github": "https://github.com/Securegarv20/TechnoFusion-2k24-Registration-form.git"
+  },
+  {
+    "id": 8,
+    "title": "AI-based Attendance Tracker",
+    "description": "This project is designed to track attendance using AI and facial recognition. It can also monitor student behavior during class, detecting if students are distracted or not paying attention.",
+    "image": "https://github.com/Securegarv20/AI-based-Attendance-Tracker-with-behavioural-tracking-and-phone-recognition/raw/master/test2.png",
+    "tags": ["Python"],
+    "github": "https://github.com/Securegarv20/AI-based-Attendance-Tracker-with-behavioural-tracking-and-phone-recognition.git",
+    "liveDemo": ""
+  }
+]

@@ -1,0 +1,95 @@
+
+[
+  {
+    "id": 1,
+    "institution": "Jain (Deemed-to-be) University",
+    "degree": "Bachelor of Computer Applications (BCA)",
+    "period": "2022 - 2025",
+    "description": "Focused on computer science fundamentals, programming, and cybersecurity concepts. Participated in various coding competitions and cybersecurity workshops.",
+    "type": "education",
+    "certificateLink": ""
+  },
+  {
+    "id": 2,
+    "institution": "EC-Council",
+    "degree": "Certified Ethical Hacker (CEH v12)",
+    "period": "2025 - 2026",
+    "description": "Professional certification in ethical hacking methodologies, tools, and techniques. Learned about penetration testing, system vulnerabilities, and cybersecurity defense strategies.",
+    "type": "certification",
+    "certificateLink": "https://aspen.eccouncil.org/VerifyBadge?type=certification&a=IKEuG2xwehAcVz22Jn4v0ft8QtYFUCxFPrjPMRXl0JM="
+  },
+  {
+    "id": 3,
+    "institution": "EC-Council",
+    "degree": "Certified Network Defender (CND v3)",
+    "period": "2025 - 2026",
+    "description": "Specialized training in network security, threat detection, and implementing effective network defense mechanisms. Developed skills in securing and protecting critical network infrastructure.",
+    "type": "certification",
+    "certificateLink": "https://aspen.eccouncil.org/VerifyBadge?type=certification&a=IKEuG2xwehAcVz22Jn4v0ft8QtYFUCxFPrjPMRXl0JM="
+  },
+
+    {
+      "id": 4,
+      "institution": "Infosec",
+      "degree": "Cyber Incident Response",
+      "period": "Dec 2024",
+      "description": "Training in identifying, managing, and mitigating cyber incidents. Gained practical skills for incident response and recovery in high-pressure situations.",
+      "type": "certification",
+      "certificateLink": "https://www.coursera.org/account/accomplishments/specialization/GSYK7I0769OF"
+    },
+    {
+      "id": 5,
+      "institution": "Infosec",
+      "degree": "Stages of Incident Response",
+      "period": "Dec 2024",
+      "description": "An in-depth understanding of the various stages of incident response, from identification to containment, eradication, recovery, and post-incident analysis.",
+      "type": "certification",
+      "certificateLink": "https://www.coursera.org/account/accomplishments/verify/3F7UI40I21W7"
+    },
+    {
+      "id": 6,
+      "institution": "EC-Council",
+      "degree": "Digital Forensics Essentials (DFE)",
+      "period": "Oct 2024",
+      "description": "Fundamental training in digital forensics with a focus on data acquisition, analysis, and preserving evidence in compliance with legal standards.",
+      "type": "certification",
+      "certificateLink": "https://www.coursera.org/account/accomplishments/records/BGJW4RVU2O8V"
+    },
+    {
+      "id": 7,
+      "institution": "Coursera Project Network",
+      "degree": "Metasploit for Beginners: Ethical Penetration Testing",
+      "period": "Sep 2024",
+      "description": "Introduction to ethical penetration testing using Metasploit, covering exploitation techniques, vulnerability assessments, and gaining hands-on experience with real-world penetration testing scenarios.",
+      "type": "certification",
+      "certificateLink": "https://www.coursera.org/account/accomplishments/records/BGJW4RVU2O8V"
+    },
+      {
+        "id": 8,
+        "institution": "Writer's Pocket",
+        "degree": "Between the Silence",
+        "period": "2025",
+        "description": "A poetry collection exploring the depths of human emotion, love, loss, and self-discovery, capturing the raw essence of identity and resilience.",
+        "type": "publication",
+        "certificateLink": "https://amzn.in/d/ew0DKrg "
+      },
+      {
+        "id": 9,
+        "institution": "IJIRT",
+        "degree": "AI-BASED CLASSROOM MONITORING AND ATTENDANCE SYSTEM",
+        "period": "2025",
+        "description": "A system that integrates real-time data and behavioral analysis to track student attendance, engagement, and classroom dynamics, enhancing teaching effectiveness.",
+        "type": "publication",
+        "certificateLink": "https://ijirt.org/Article?manuscript=174024"
+      },
+      {
+        "id": 10,
+        "institution": "Writer's Pocket",
+        "degree": "What we Leave Unsaid",
+        "period": "2025",
+        "description": "A collection of poems reflecting on the unspoken battles we face within ourselves—moments lost to time and the weight of words left unsaid.",
+        "type": "publication",
+        "certificateLink": "https://amzn.to/4cLSId8"
+      }    
+
+]
