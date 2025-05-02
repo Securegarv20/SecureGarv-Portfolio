@@ -220,7 +220,7 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <a
-                  href="https://drive.google.com/your-resume-link-here"
+                  href="https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 bg-primary text-white rounded-lg hover-glow flex items-center justify-center gap-2 group"
