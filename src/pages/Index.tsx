@@ -50,7 +50,7 @@ const Index = () => {
     formDataToSend.append('name', formData.name);
     formDataToSend.append('email', formData.email);
     formDataToSend.append('message', formData.message);
-    formDataToSend.append('subject', 'New Contact Form Submission');
+    formDataToSend.append('subject', 'New Query from Portfolio Website');
     formDataToSend.append('botcheck', '');
 
     try {
@@ -252,6 +252,16 @@ const Index = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-20">
+          {/* Avatar Image - Now at the very top only on mobile */}
+          <div className="lg:hidden flex flex-col items-center animate-fade-in mb-12">
+            <div className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 rounded-full overflow-hidden relative glass p-1 glow-border">
+              <img
+                src="/hero.png"
+                alt="Garv Kamra"
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in text-center lg:text-left">
               <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
@@ -275,7 +285,7 @@ const Index = () => {
                 />
               </h1>
               <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
-              Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development. 
+                Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development. 
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <a
@@ -296,7 +306,7 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="flex flex-col items-center animate-fade-in">
+            <div className="hidden lg:flex flex-col items-center animate-fade-in">
               <div className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 rounded-full overflow-hidden relative glass p-1 glow-border">
                 <img
                   src="/hero.png"
