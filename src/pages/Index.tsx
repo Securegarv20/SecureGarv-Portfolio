@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { toast } from 'react-hot-toast';
 import { TypeAnimation } from 'react-type-animation';
 import { ArrowRight, Shield, Code, GraduationCap, User, Brain, Rocket, Briefcase, Mail, Github, Linkedin, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
@@ -19,6 +20,64 @@ const Index = () => {
   const [mouseActive, setMouseActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeFilter, setActiveFilter] = useState<'all' | 'education' | 'certification' | 'achievement' | 'publication'>('all');
+
+  // Contact Form Section
+  const [isSending, setIsSending] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+
+    setIsSending(true);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('access_key', 'e8b33d14-ea31-444c-8b34-b9709b50505e');
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('message', formData.message);
+    formDataToSend.append('subject', 'New Contact Form Submission');
+    formDataToSend.append('botcheck', '');
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Message sent successfully!');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        toast.error(data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
   
   useEffect(() => {
     const gridContainer = gridRef.current;
@@ -628,112 +687,141 @@ const Index = () => {
         </div>
       </section>
       
-      <section id="contact" className="py-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-              Let's <span className="text-gradient-primary">Connect</span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Have a question or want to work together? Feel free to reach out!
-            </p>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <motion.div 
-              className="glass p-8 rounded-lg"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+        {/* Contact Section */}
+        <section id="contact" className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-16"
             >
-              <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
-              <form className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
-                  <input
-                    type="email"
-                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Message</label>
-                  <textarea
-                    rows={4}
-                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover-glow"
-                >
-                  Send Message
-                </button>
-              </form>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                Let's <span className="text-gradient-primary">Connect</span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Have a question or want to work together? Feel free to reach out!
+              </p>
             </motion.div>
             
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex flex-col justify-center"
-            >
-              <div className="glass p-8 rounded-lg mb-8">
-                <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Mail className="text-primary" />
-                    <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
-                      garvkamra24@gmail.com
-                    </a>
+            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+              <motion.div 
+                className="glass p-8 rounded-lg"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium mb-2">Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                    />
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Github className="text-primary" />
-                    <a href="https://github.com/Securegarv20" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                      github.com/Securegarv20
-                    </a>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                    />
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Linkedin className="text-primary" />
-                    <a href="https://www.linkedin.com/in/garvkamra/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                      linkedin.com/in/garvkamra
-                    </a>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium mb-2">Message</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={4}
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                    ></textarea>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className={`w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover-glow flex items-center justify-center ${
+                      isSending ? 'opacity-75 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {isSending ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Message'
+                    )}
+                  </button>
+                </form>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="flex flex-col justify-center"
+              >
+                <div className="glass p-8 rounded-lg mb-8">
+                  <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Mail className="text-primary" />
+                      <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
+                        garvkamra24@gmail.com
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Github className="text-primary" />
+                      <a href="https://github.com/Securegarv20" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                        github.com/Securegarv20
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Linkedin className="text-primary" />
+                      <a href="https://www.linkedin.com/in/garvkamra/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                        linkedin.com/in/garvkamra
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="glass p-8 rounded-lg">
-                <h3 className="text-2xl font-bold mb-6">Let's Connect</h3>
-                <p className="text-muted-foreground mb-6">
-                  I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
-                </p>
-                <a
-                  href="https://mail.google.com/mail/?view=cm&fs=1&to=garvkamra24@gmail.com&su=Let's%20Connect"
-                  target="_blank"
-                  className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg block text-center"
-                >
-                  Schedule a call
-                </a>
-              </div>
-
-            </motion.div>
+                
+                <div className="glass p-8 rounded-lg">
+                  <h3 className="text-2xl font-bold mb-6">Let's Connect</h3>
+                  <p className="text-muted-foreground mb-6">
+                    I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
+                  </p>
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=garvkamra24@gmail.com&su=Let's%20Connect"
+                    target="_blank"
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg block text-center"
+                  >
+                    Schedule a call
+                  </a>
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
       <footer className="text-center text-sm text-muted-foreground py-6">
-      © {new Date().getFullYear()} Garv Kamra. All rights reserved.
-    </footer>
+        © {new Date().getFullYear()} Garv Kamra. All rights reserved.
+      </footer>
     </div>
   );
 };
