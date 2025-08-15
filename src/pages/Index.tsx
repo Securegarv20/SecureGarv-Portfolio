@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { toast } from 'react-hot-toast';
 import { TypeAnimation } from 'react-type-animation';
 import { ArrowRight, Shield, Code, GraduationCap, User, Brain, Rocket, Briefcase, Mail, Github, Linkedin, ExternalLink } from "lucide-react";
@@ -9,19 +9,71 @@ import ProjectCard from "../components/ProjectCard";
 import ExperienceCard from "../components/ExperienceCard";
 import EducationCard from "../components/EducationCard";
 import FilterButton from "../components/FilterButton";
-import projects from '../data/projects.json';
-import experiences from '../data/experience.json';
-import education from '../data/education.json';
+
+// API configuration - Update this with your backend URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Types
+interface HeroContent {
+  typewriterTexts: string[];
+  heroSubtitle: string;
+  heroParagraph: string;
+    resume: {
+    url: string;
+    fileName: string;
+  };
+    about?: AboutContent;
+}
+
+interface AboutContent {
+  whoIAm: string;
+  myExpertise: string;
+  myMission: string;
+  myJourney: string;
+}
+
+interface EducationItem {
+  id: string;
+  type: 'education' | 'certification' | 'achievement' | 'publication';
+  institution: string;
+  degree: string;
+  period: string;
+  description: string;
+  certificateLink?: string;
+}
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  tags: string[];
+  github?: string;
+  liveDemo?: string;
+}
+
+interface Experience {
+  id: string;
+  company: string;
+  position: string;
+  period: string;
+  description: string;
+}
 
 const Index = () => {
+  // Refs
   const observerRef = useRef<IntersectionObserver | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+
+  // Mouse effects state
   const [mouseActive, setMouseActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Education filter state
   const [activeFilter, setActiveFilter] = useState<'all' | 'education' | 'certification' | 'achievement' | 'publication'>('all');
 
-  // Contact Form Section
+  // Contact form state
   const [isSending, setIsSending] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -29,56 +81,132 @@ const Index = () => {
     message: ''
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error('Please fill all fields');
-      return;
+  // ========== HERO SECTION ==========
+  const [heroContent, setHeroContent] = useState<HeroContent>({
+    typewriterTexts: [
+      "I'm a Front-End Developer",
+      "I'm a Cybersecurity Professional",
+      "I'm CEH v12 Certified",
+      "I'm an Arduino Trainer",
+      "I'm a StartUp Founder"
+    ],
+    heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional...",
+    resume: {
+      url: "https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing",
+      fileName: "Garv_Kamra_Resume.pdf"
     }
+  });
+  const [isLoadingHero, setIsLoadingHero] = useState(true);
 
-    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      toast.error('Please enter a valid email');
-      return;
-    }
-
-    setIsSending(true);
-
-    const formDataToSend = new FormData();
-    formDataToSend.append('access_key', 'e8b33d14-ea31-444c-8b34-b9709b50505e');
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('message', formData.message);
-    formDataToSend.append('subject', 'New Query from Portfolio Website');
-    formDataToSend.append('botcheck', '');
-
+  // BACKEND INTEGRATION FOR HERO SECTION (UNCOMMENT WHEN READY)
+ useEffect(() => {
+  const fetchHeroContent = async () => {
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: formDataToSend
-      });
+      setIsLoadingHero(true);
+      const response = await fetch(`${API_URL}/api/content`);
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-
-      if (data.success) {
-        toast.success('Message sent successfully!');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        toast.error(data.message || 'Failed to send message. Please try again.');
-      }
+      setHeroContent({
+        typewriterTexts: data.typewriterTexts || heroContent.typewriterTexts,
+        heroParagraph: data.heroParagraph || heroContent.heroParagraph,
+        resume: data.resume || heroContent.resume,
+        about: data.about || {
+          whoIAm: "Hey, I'm Garv Kamra...", // default content
+          myExpertise: "I have hands-on experience...", // default content
+          myMission: "My mission is to keep learning...", // default content
+          myJourney: "Ever since I was a kid..." // default content
+        }
+      });
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      console.error('Error fetching hero content:', error);
+      toast.error('Failed to load hero content. Using default values.');
     } finally {
-      setIsSending(false);
+      setIsLoadingHero(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  fetchHeroContent();
+}, []);
+
+  const typeAnimationSequence = useMemo(() => {
+    return heroContent.typewriterTexts.flatMap(text => [text, 2000]);
+  }, [heroContent.typewriterTexts]);
+
+
   
+
+  // ========== EDUCATION SECTION ==========
+  const [education, setEducation] = useState<EducationItem[]>([]);
+  const [isLoadingEducation, setIsLoadingEducation] = useState(true);
+
+  /* BACKEND INTEGRATION FOR EDUCATION (UNCOMMENT WHEN READY)
+  useEffect(() => {
+    const fetchEducation = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/education`);
+        const data = await response.json();
+        setEducation(data);
+      } catch (error) {
+        console.error('Error fetching education:', error);
+        toast.error('Failed to load education data');
+      } finally {
+        setIsLoadingEducation(false);
+      }
+    };
+
+    fetchEducation();
+  }, []);
+  */
+
+  // ========== PROJECTS SECTION ==========
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+
+  /* BACKEND INTEGRATION FOR PROJECTS (UNCOMMENT WHEN READY)
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/projects`);
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        toast.error('Failed to load projects');
+      } finally {
+        setIsLoadingProjects(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+  */
+
+  // ========== EXPERIENCE SECTION ==========
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [isLoadingExperiences, setIsLoadingExperiences] = useState(true);
+
+  /* BACKEND INTEGRATION FOR EXPERIENCE (UNCOMMENT WHEN READY)
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/experiences`);
+        const data = await response.json();
+        setExperiences(data);
+      } catch (error) {
+        console.error('Error fetching experiences:', error);
+        toast.error('Failed to load experiences');
+      } finally {
+        setIsLoadingExperiences(false);
+      }
+    };
+
+    fetchExperiences();
+  }, []);
+  */
+
+  // Mouse effect handlers
   useEffect(() => {
     const gridContainer = gridRef.current;
     const glowElement = glowRef.current;
@@ -176,6 +304,57 @@ const Index = () => {
     };
   }, []);
 
+  // Contact form handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+
+    setIsSending(true);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('access_key', 'e8b33d14-ea31-444c-8b34-b9709b50505e');
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('message', formData.message);
+    formDataToSend.append('subject', 'New Query from Portfolio Website');
+    formDataToSend.append('botcheck', '');
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Message sent successfully!');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        toast.error(data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Filter education items
   const filteredEducation = activeFilter === 'all' 
     ? education 
     : education.filter(item => item.type === activeFilter);
@@ -190,31 +369,21 @@ const Index = () => {
 
   const getIcon = (type: 'education' | 'certification' | 'achievement' | 'publication') => {
     switch (type) {
-      case 'education':
-        return <GraduationCap className="w-6 h-6 text-white" />;
-      case 'certification':
-        return <Code className="w-6 h-6 text-white" />;
-      case 'achievement':
-        return <Shield className="w-6 h-6 text-white" />;
-      case 'publication':
-        return <ArrowRight className="w-6 h-6 text-white" />;
-      default:
-        return <GraduationCap className="w-6 h-6 text-white" />;
+      case 'education': return <GraduationCap className="w-6 h-6 text-white" />;
+      case 'certification': return <Code className="w-6 h-6 text-white" />;
+      case 'achievement': return <Shield className="w-6 h-6 text-white" />;
+      case 'publication': return <ArrowRight className="w-6 h-6 text-white" />;
+      default: return <GraduationCap className="w-6 h-6 text-white" />;
     }
   };
 
   const getIconBgClass = (type: 'education' | 'certification' | 'achievement' | 'publication') => {
     switch (type) {
-      case 'education':
-        return 'bg-purple-500';
-      case 'certification':
-        return 'bg-blue-500';
-      case 'achievement':
-        return 'bg-amber-500';
-      case 'publication':
-        return 'bg-emerald-500';
-      default:
-        return 'bg-primary';
+      case 'education': return 'bg-purple-500';
+      case 'certification': return 'bg-blue-500';
+      case 'achievement': return 'bg-amber-500';
+      case 'publication': return 'bg-emerald-500';
+      default: return 'bg-primary';
     }
   };
 
@@ -222,8 +391,10 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <MainNav />
 
+      {/* Hero Section */}
       <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-32">
         <div ref={gridRef} className="absolute inset-0 grid-background">
+          {/* Background elements */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute w-[200%] h-[200%] -left-[50%] -top-[50%] bg-primary/10 blur-[200px] opacity-70 animate-pulse-slow"></div>
             <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/30 rounded-full blur-[150px] animate-pulse-slow"></div>
@@ -252,7 +423,7 @@ const Index = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-20">
-          {/* Avatar Image - Now at the very top only on mobile */}
+          {/* Mobile Avatar */}
           <div className="lg:hidden flex flex-col items-center animate-fade-in mb-12">
             <div className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 rounded-full overflow-hidden relative glass p-1 glow-border">
               <img
@@ -262,34 +433,34 @@ const Index = () => {
               />
             </div>
           </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in text-center lg:text-left">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
-                <span className="text-gradient-primary">Hello</span>,{" "}
-                <TypeAnimation
-                  sequence={[
-                    "I'm a Front-End Developer",
-                    2000,
-                    "I'm a Cybersecurity Professional",
-                    2000,
-                    "I'm CEH v12 Certified",
-                    2000,
-                    "I'm an Arduino Trainer",
-                    2000,
-                    "I'm a StartUp Founder",
-                    2000,
-                  ]}
-                  wrapper="span"
-                  speed={50}
-                  repeat={Infinity}
-                />
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
-                Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development. 
-              </p>
+              {isLoadingHero ? (
+                <div className="animate-pulse space-y-4">
+                  <div className="h-12 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-full"></div>
+                  <div className="h-6 bg-gray-200 rounded w-5/6"></div>
+                </div>
+              ) : (
+                <>
+                  <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
+                    <span className="text-gradient-primary">Hello</span>,{" "}
+                    <TypeAnimation
+                      sequence={typeAnimationSequence}
+                      wrapper="span"
+                      speed={50}
+                      repeat={Infinity}
+                    />
+                  </h1>
+                  <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+                    {heroContent.heroParagraph}
+                  </p>
+                </>
+              )}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <a
-                  href="https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing"
+                  href={heroContent.resume.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 bg-primary text-white rounded-lg hover-glow flex items-center justify-center gap-2 group"
@@ -306,6 +477,7 @@ const Index = () => {
               </div>
             </div>
             
+            {/* Desktop Avatar */}
             <div className="hidden lg:flex flex-col items-center animate-fade-in">
               <div className="w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 rounded-full overflow-hidden relative glass p-1 glow-border">
                 <img
@@ -383,11 +555,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold">Who I Am</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed">
-              Hey, I'm Garv Kamra—Cybersecurity Professional and Front-End Developer with a strong foundation in CEH v12 and CND v3 certifications. 
-              With a BCA degree from Jain University, I'm passionate about securing digital spaces and creating user-friendly websites. 
-              In addition to my technical expertise, I'm actively building a tech community focused on cybersecurity and development, 
-              helping students and professionals collaborate, learn, and grow together. 
-              My goal is to blend my knowledge in cybersecurity and web development to create impactful solutions and empower others in the tech space.
+                {heroContent.about?.whoIAm || "Loading..."}
               </p>
             </motion.div>
 
@@ -420,12 +588,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold">My Expertise</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed">
-              I have hands-on experience with Kali Linux and Arch. with a solid foundation in ethical hacking 
-              and network defense. I’ve worked with Arduino, NodeMCU, and robotics, and have even taught robotics to others. 
-              Recently, I earned my CEH and CND certifications, further enhancing my skills in cybersecurity.
-              In addition to my technical expertise, I have a strong passion for Frontend development and enjoy creating user interfaces 
-              that are both functional and visually appealing. I also have leadership experience, guiding teams, bringing ideas to life, 
-              and helping others develop their skills and knowledge.
+                {heroContent.about?.myExpertise || "Loading..."}
               </p>
             </motion.div>
 
@@ -458,7 +621,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold">My Mission</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed">
-              My mission is to keep learning, growing, and contributing to the cybersecurity field, while continuously developing my skills in both cybersecurity and front-end development. Through my startup, NeevCode, I aim to create a platform where students can share knowledge, collaborate, and learn together. My personal mission is to help others build practical, real-world skills, fostering a community where everyone can grow, thrive, and make an impact in the tech world. By empowering individuals with personalized education and hands-on experience, I strive to create opportunities for everyone to succeed.
+                {heroContent.about?.myMission || "Loading..."}
               </p>
             </motion.div>
           </div>
@@ -488,18 +651,9 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
               My <span className="text-primary">Journey</span>
             </h2>
-            <p className="text-muted-foreground leading-relaxed">
-            Ever since I was a kid, I’ve been fascinated by hardware and robotics, spending a lot of time experimenting with circuits, microcontrollers, and building my own projects. Over time, my curiosity grew towards cybersecurity, and I started exploring areas like ethical hacking and system defense.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
-            Although I’ve focused more on cybersecurity, I’ve stayed close to my hardware roots. Now, I’m exploring hardware hacking, looking into how IoT devices work, how they can be hacked, and how to create tools from them.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
-            In addition to my technical journey, I founded NeevCode—a platform designed to help students grow through personalized learning and hands-on experience. Now, I’m also building a community focused on cybersecurity and AI, where members can collaborate, learn, and participate in challenges to sharpen their skills.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
-            I’m committed to expanding my expertise in cybersecurity and hardware hacking, while continuing to develop NeevCode into a hub for students and tech enthusiasts.
-            </p>
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              {heroContent.about?.myJourney || "Loading..."}
+            </div>
           </motion.div>
 
           <div className="pt-12 mb-16">
@@ -515,6 +669,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+
       
       <section id="education" className="py-20 bg-background/50">
         <div className="container mx-auto px-4">
