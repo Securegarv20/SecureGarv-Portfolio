@@ -16,13 +16,12 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Types
 interface HeroContent {
   typewriterTexts: string[];
-  heroSubtitle: string;
   heroParagraph: string;
-    resume: {
+  resume: {
     url: string;
     fileName: string;
   };
-    about?: AboutContent;
+  about?: AboutContent;
 }
 
 interface AboutContent {
@@ -90,7 +89,7 @@ const Index = () => {
       "I'm an Arduino Trainer",
       "I'm a StartUp Founder"
     ],
-    heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional...",
+    heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development.",
     resume: {
       url: "https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing",
       fileName: "Garv_Kamra_Resume.pdf"
@@ -99,36 +98,36 @@ const Index = () => {
   const [isLoadingHero, setIsLoadingHero] = useState(true);
 
   // BACKEND INTEGRATION FOR HERO SECTION (UNCOMMENT WHEN READY)
- useEffect(() => {
-  const fetchHeroContent = async () => {
-    try {
-      setIsLoadingHero(true);
-      const response = await fetch(`${API_URL}/api/content`);
-      
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  useEffect(() => {
+    const fetchHeroContent = async () => {
+      try {
+        setIsLoadingHero(true);
+        const response = await fetch(`${API_URL}/api/content`);
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const data = await response.json();
-      setHeroContent({
-        typewriterTexts: data.typewriterTexts || heroContent.typewriterTexts,
-        heroParagraph: data.heroParagraph || heroContent.heroParagraph,
-        resume: data.resume || heroContent.resume,
-        about: data.about || {
-          whoIAm: "Hey, I'm Garv Kamra...", // default content
-          myExpertise: "I have hands-on experience...", // default content
-          myMission: "My mission is to keep learning...", // default content
-          myJourney: "Ever since I was a kid..." // default content
-        }
-      });
-    } catch (error) {
-      console.error('Error fetching hero content:', error);
-      toast.error('Failed to load hero content. Using default values.');
-    } finally {
-      setIsLoadingHero(false);
-    }
-  };
+        const data = await response.json();
+        setHeroContent({
+          typewriterTexts: data.typewriterTexts || heroContent.typewriterTexts,
+          heroParagraph: data.heroParagraph || heroContent.heroParagraph,
+          resume: data.resume || heroContent.resume,
+          about: data.about || {
+            whoIAm: "Hey, I'm Garv Kamra...",
+            myExpertise: "I have hands-on experience...",
+            myMission: "My mission is to keep learning...",
+            myJourney: "Ever since I was a kid..."
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching hero content:', error);
+        toast.error('Failed to load hero content. Using default values.');
+      } finally {
+        setIsLoadingHero(false);
+      }
+    };
 
-  fetchHeroContent();
-}, []);
+    fetchHeroContent();
+  }, []);
 
   const typeAnimationSequence = useMemo(() => {
     return heroContent.typewriterTexts.flatMap(text => [text, 2000]);
