@@ -11,7 +11,7 @@ import EducationCard from "../components/EducationCard";
 import FilterButton from "../components/FilterButton";
 
 // API configuration - Update this with your backend URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Types
 interface HeroContent {
