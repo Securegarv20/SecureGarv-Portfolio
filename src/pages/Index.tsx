@@ -162,7 +162,7 @@ const Index = () => {
           ],
           heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development.",
           resume: {
-            url: "https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing",
+            url: "https://drive.google.com/file/d/1KO0ShGA4uELdhCkClEfmTVnX6jJPaJmh/view?usp=drive_link",
             fileName: "Garv_Kamra_Resume.pdf"
           },
           about: {
@@ -796,7 +796,7 @@ const Index = () => {
             }}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
-              My <span className="text-primary">Journey</span>
+              My <span className="text-primary">From Curiosity to Cybersecurity</span>
             </h2>
             <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
               {heroContent.about?.myJourney}
