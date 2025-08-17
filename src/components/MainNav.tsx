@@ -46,7 +46,7 @@ const MainNav = () => {
         <div className="flex items-center">
           <div className="hidden sm:flex glass px-4 py-2 sm:px-6 sm:py-3 rounded-full items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-sm sm:text-base">Available for Projects/Work</span>
+            <span className="text-sm sm:text-base">Available for Projects</span>
           </div>
           
           {/* Mobile Version - Just the dot */}
@@ -59,7 +59,7 @@ const MainNav = () => {
               <div className="w-4 h-4 rounded-full bg-green-500 animate-pulse"></div>
               {showAvailability && (
                 <div className="absolute top-full left-0 mt-2 glass px-4 py-2 rounded-lg whitespace-nowrap z-50">
-                  Available for Projects/Work
+                  Available for Projects
                 </div>
               )}
             </button>

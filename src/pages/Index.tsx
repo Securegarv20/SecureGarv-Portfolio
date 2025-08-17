@@ -10,10 +10,12 @@ import ExperienceCard from "../components/ExperienceCard";
 import EducationCard from "../components/EducationCard";
 import FilterButton from "../components/FilterButton";
 
-// API configuration - Update this with your backend URL
-const API_URL = import.meta.env.VITE_API_URL;
+// API configuration - Update with your backend URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// Types
+/**
+ * Types for our content structure
+ */
 interface HeroContent {
   typewriterTexts: string[];
   heroParagraph: string;
@@ -21,14 +23,12 @@ interface HeroContent {
     url: string;
     fileName: string;
   };
-  about?: AboutContent;
-}
-
-interface AboutContent {
-  whoIAm: string;
-  myExpertise: string;
-  myMission: string;
-  myJourney: string;
+  about?: {
+    whoIAm: string;
+    myExpertise: string;
+    myMission: string;
+    myJourney: string;
+  };
 }
 
 interface EducationItem {
@@ -42,25 +42,40 @@ interface EducationItem {
 }
 
 interface Project {
-  id: string;
+  _id: string;
   title: string;
   description: string;
+  technologies: string[];
+  liveUrl: string;
+  githubUrl: string;
   image: string;
-  tags: string[];
-  github?: string;
-  liveDemo?: string;
+  category: string;
 }
 
 interface Experience {
-  id: string;
+  _id: string;
   company: string;
   position: string;
-  period: string;
+  location: string;
+  startDate: string;
+  endDate: string;
   description: string;
+  achievements: string[];
+  technologies: string[];
+  isCurrentJob: boolean;
+}
+
+interface Skill {
+  _id: string;
+  name: string;
+  category: string;
+  iconUrl?: string;
+  proficiency: number;
+  featured?: boolean;
 }
 
 const Index = () => {
-  // Refs
+  // Refs for mouse effects
   const observerRef = useRef<IntersectionObserver | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
@@ -77,135 +92,195 @@ const Index = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    subject: '', // Add subject field
     message: ''
   });
 
-  // ========== HERO SECTION ==========
+  // Data states
   const [heroContent, setHeroContent] = useState<HeroContent>({
-    typewriterTexts: [
-      "I'm a Front-End Developer",
-      "I'm a Cybersecurity Professional",
-      "I'm CEH v12 Certified",
-      "I'm an Arduino Trainer",
-      "I'm a StartUp Founder"
-    ],
-    heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development.",
-    resume: {
-      url: "https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing",
-      fileName: "Garv_Kamra_Resume.pdf"
-    }
+    typewriterTexts: [],
+    heroParagraph: '',
+    resume: { url: '', fileName: '' }
   });
-  const [isLoadingHero, setIsLoadingHero] = useState(true);
+  const [education, setEducation] = useState<EducationItem[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // BACKEND INTEGRATION FOR HERO SECTION (UNCOMMENT WHEN READY)
+  // ========================
+  // DATA FETCHING
+  // ========================
   useEffect(() => {
-    const fetchHeroContent = async () => {
+    const fetchData = async () => {
       try {
-        setIsLoadingHero(true);
-        const response = await fetch(`${API_URL}/api/content`);
+        setLoading(true);
+        setError(null);
         
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        // Fetch all data in parallel
+        const [contentRes, educationRes, projectsRes, experienceRes, skillsRes] = await Promise.all([
+          fetch(`${API_URL}/api/content`),
+          fetch(`${API_URL}/api/education`),
+          fetch(`${API_URL}/api/projects`),
+          fetch(`${API_URL}/api/experience`),
+          fetch(`${API_URL}/api/skills`)
+        ]);
 
-        const data = await response.json();
+        if (!contentRes.ok) throw new Error('Failed to fetch content');
+        if (!educationRes.ok) throw new Error('Failed to fetch education');
+        if (!projectsRes.ok) throw new Error('Failed to fetch projects');
+        if (!experienceRes.ok) throw new Error('Failed to fetch experience');
+        if (!skillsRes.ok) throw new Error('Failed to fetch skills');
+
+        const [content, education, projects, experience, skills] = await Promise.all([
+          contentRes.json(),
+          educationRes.json(),
+          projectsRes.json(),
+          experienceRes.json(),
+          skillsRes.json()
+        ]);
+
+        setHeroContent(content);
+        setEducation(education);
+        setProjects(projects);
+        setExperiences(experience);
+        setSkills(skills);
+
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data. Using default values.');
+        
+        // Set mock data when in development or if API fails
         setHeroContent({
-          typewriterTexts: data.typewriterTexts || heroContent.typewriterTexts,
-          heroParagraph: data.heroParagraph || heroContent.heroParagraph,
-          resume: data.resume || heroContent.resume,
-          about: data.about || {
-            whoIAm: "Hey, I'm Garv Kamra...",
-            myExpertise: "I have hands-on experience...",
-            myMission: "My mission is to keep learning...",
-            myJourney: "Ever since I was a kid..."
+          typewriterTexts: [
+            "I'm a Front-End Developer",
+            "I'm a Cybersecurity Professional",
+            "I'm CEH v12 Certified",
+            "I'm an Arduino Trainer",
+            "I'm a StartUp Founder"
+          ],
+          heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development.",
+          resume: {
+            url: "https://drive.google.com/file/d/1skRKmA4gnJZiP_EMTxjzdhtWxsrIiRyW/view?usp=sharing",
+            fileName: "Garv_Kamra_Resume.pdf"
+          },
+          about: {
+            whoIAm: "Hey, I'm Garv Kamra, a passionate cybersecurity professional and front-end developer with a knack for creating secure and beautiful digital experiences.",
+            myExpertise: "I have hands-on experience in penetration testing, vulnerability assessment, and front-end development. Certified in CEH v12 and CND v3, I bring both technical skills and creative problem-solving to every project.",
+            myMission: "My mission is to keep learning and growing in the cybersecurity field while helping businesses create secure and user-friendly web applications. I believe in the power of technology to solve real-world problems.",
+            myJourney: "Ever since I was a kid, I've been fascinated by computers and how they work. My journey began with Arduino projects, evolved into web development, and eventually led me to cybersecurity where I found my true passion."
           }
         });
-      } catch (error) {
-        console.error('Error fetching hero content:', error);
-        toast.error('Failed to load hero content. Using default values.');
+
+        setEducation([
+          {
+            id: '1',
+            type: 'education',
+            institution: 'University of Delhi',
+            degree: 'Bachelor of Science (Computer Science)',
+            period: '2020 - 2023',
+            description: 'Graduated with honors in Computer Science. Specialized in cybersecurity and web development.'
+          },
+          {
+            id: '2',
+            type: 'certification',
+            institution: 'EC-Council',
+            degree: 'Certified Ethical Hacker (CEH v12)',
+            period: '2023',
+            description: 'Certified in ethical hacking methodologies and penetration testing techniques.',
+            certificateLink: 'https://example.com/certificate'
+          }
+        ]);
+
+        setProjects([
+          {
+            _id: '1',
+            title: 'Secure Portfolio Website',
+            description: 'A personal portfolio website with security features and admin panel.',
+            technologies: ['React', 'Node.js', 'MongoDB'],
+            liveUrl: 'https://yourportfolio.com',
+            githubUrl: 'https://github.com/yourusername/portfolio',
+            image: '/project1.jpg',
+            category: 'Web Development'
+          },
+          {
+            _id: '2',
+            title: 'Vulnerability Scanner',
+            description: 'A web application vulnerability scanner built with Python.',
+            technologies: ['Python', 'Security', 'Flask'],
+            liveUrl: '',
+            githubUrl: 'https://github.com/yourusername/vuln-scanner',
+            image: '/project2.jpg',
+            category: 'Security'
+          }
+        ]);
+
+        setExperiences([
+          {
+            _id: '1',
+            company: 'Tech Solutions Inc.',
+            position: 'Frontend Developer & Security Specialist',
+            location: 'Remote',
+            startDate: '2022-01-01',
+            endDate: '2023-12-31',
+            description: 'Developed secure web applications and conducted vulnerability assessments.',
+            achievements: ['Implemented security measures', 'Improved frontend performance'],
+            technologies: ['React', 'Node.js', 'TypeScript'],
+            isCurrentJob: false
+          },
+          {
+            _id: '2',
+            company: 'Freelance',
+            position: 'Web Developer',
+            location: 'Remote',
+            startDate: '2020-01-01',
+            endDate: '2022-01-01',
+            description: 'Built custom websites for clients with a focus on security best practices.',
+            achievements: ['Delivered 10+ client projects', 'Implemented security audits'],
+            technologies: ['HTML', 'CSS', 'JavaScript'],
+            isCurrentJob: false
+          }
+        ]);
+
+        setSkills([
+          { _id: '1', name: 'React', category: 'Frontend', proficiency: 90, featured: true },
+          { _id: '2', name: 'TypeScript', category: 'Frontend', proficiency: 85, featured: false },
+          { _id: '3', name: 'Penetration Testing', category: 'Security', proficiency: 80, featured: false },
+          { _id: '4', name: 'Node.js', category: 'Backend', proficiency: 75, featured: true },
+          { _id: '5', name: 'Python', category: 'Backend', proficiency: 70, featured: true }
+        ]);
+
       } finally {
-        setIsLoadingHero(false);
+        setLoading(false);
       }
     };
 
-    fetchHeroContent();
+    fetchData();
   }, []);
 
+  // Generate typewriter animation sequence
   const typeAnimationSequence = useMemo(() => {
     return heroContent.typewriterTexts.flatMap(text => [text, 2000]);
   }, [heroContent.typewriterTexts]);
 
+  // Count education items by type
+  const counts = {
+    all: education.length,
+    education: education.filter(item => item.type === 'education').length,
+    certification: education.filter(item => item.type === 'certification').length,
+    achievement: education.filter(item => item.type === 'achievement').length,
+    publication: education.filter(item => item.type === 'publication').length
+  };
 
-  
+  // Filter education items
+  const filteredEducation = activeFilter === 'all' 
+    ? education 
+    : education.filter(item => item.type === activeFilter);
 
-  // ========== EDUCATION SECTION ==========
-  const [education, setEducation] = useState<EducationItem[]>([]);
-  const [isLoadingEducation, setIsLoadingEducation] = useState(true);
-
-  /* BACKEND INTEGRATION FOR EDUCATION (UNCOMMENT WHEN READY)
-  useEffect(() => {
-    const fetchEducation = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/education`);
-        const data = await response.json();
-        setEducation(data);
-      } catch (error) {
-        console.error('Error fetching education:', error);
-        toast.error('Failed to load education data');
-      } finally {
-        setIsLoadingEducation(false);
-      }
-    };
-
-    fetchEducation();
-  }, []);
-  */
-
-  // ========== PROJECTS SECTION ==========
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-
-  /* BACKEND INTEGRATION FOR PROJECTS (UNCOMMENT WHEN READY)
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/projects`);
-        const data = await response.json();
-        setProjects(data);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        toast.error('Failed to load projects');
-      } finally {
-        setIsLoadingProjects(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-  */
-
-  // ========== EXPERIENCE SECTION ==========
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [isLoadingExperiences, setIsLoadingExperiences] = useState(true);
-
-  /* BACKEND INTEGRATION FOR EXPERIENCE (UNCOMMENT WHEN READY)
-  useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/experiences`);
-        const data = await response.json();
-        setExperiences(data);
-      } catch (error) {
-        console.error('Error fetching experiences:', error);
-        toast.error('Failed to load experiences');
-      } finally {
-        setIsLoadingExperiences(false);
-      }
-    };
-
-    fetchExperiences();
-  }, []);
-  */
-
-  // Mouse effect handlers
+   // ========================
+  // MOUSE EFFECTS
+  // ========================
   useEffect(() => {
     const gridContainer = gridRef.current;
     const glowElement = glowRef.current;
@@ -303,69 +378,137 @@ const Index = () => {
     };
   }, []);
 
-  // Contact form handler
+  // ========================
+  // CONTACT FORM HANDLER
+  // ========================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error('Please fill all fields');
+    // Basic validation - now includes subject
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast.error('Please fill all required fields');
       return;
     }
 
-    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      toast.error('Please enter a valid email');
+    // Name validation
+    if (formData.name.trim().length < 2) {
+      toast.error('Name must be at least 2 characters');
+      return;
+    }
+
+    // Subject validation
+    if (formData.subject.trim().length < 5) {
+      toast.error('Subject must be at least 5 characters');
+      return;
+    }
+
+    // Rest of your validation remains the same...
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    // Block disposable/temporary emails
+    const tempEmailDomains = [
+      'tempmail.com', 'mailinator.com', 'guerrillamail.com', 
+      '10minutemail.com', 'throwawaymail.com', 'fakeinbox.com',
+      'yopmail.com', 'trashmail.com', 'maildrop.cc'
+    ];
+    const emailDomain = formData.email.split('@')[1];
+    if (tempEmailDomains.some(domain => emailDomain.includes(domain))) {
+      toast.error('Please use a permanent email address');
+      return;
+    }
+
+    // Message validation
+    if (formData.message.trim().length < 10) {
+      toast.error('Message should be at least 10 characters');
       return;
     }
 
     setIsSending(true);
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('access_key', 'e8b33d14-ea31-444c-8b34-b9709b50505e');
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('message', formData.message);
-    formDataToSend.append('subject', 'New Query from Portfolio Website');
-    formDataToSend.append('botcheck', '');
-
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      // Send to Web3Forms first
+      const web3formData = new FormData();
+      web3formData.append('access_key', import.meta.env.VITE_WEB3FORMS_KEY);
+      web3formData.append('name', formData.name);
+      web3formData.append('email', formData.email);
+      web3formData.append('subject', formData.subject); // Include subject
+      web3formData.append('message', formData.message);
+      web3formData.append('botcheck', '');
+
+      const web3Response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: formDataToSend
+        body: web3formData
       });
 
-      const data = await response.json();
+      const web3Data = await web3Response.json();
 
-      if (data.success) {
-        toast.success('Message sent successfully!');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        toast.error(data.message || 'Failed to send message. Please try again.');
+      if (!web3Response.ok || !web3Data.success) {
+        throw new Error(web3Data.message || 'Web3Forms submission failed');
       }
+
+      // If Web3Forms succeeds, send to our backend
+      const backendResponse = await fetch(`${API_URL}/api/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject, // Include subject
+          message: formData.message,
+          isRead: false,
+          isStarred: false,
+          isArchived: false
+        })
+      });
+
+      const backendData = await backendResponse.json();
+
+      if (!backendResponse.ok) {
+        throw new Error(backendData.error || 'Backend submission failed');
+      }
+
+      // Success - clear form and show success message
+      toast.success('Message sent successfully!');
+      setFormData({ name: '', email: '', subject: '', message: '' }); // Reset subject too
+      
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      console.error('Error sending message:', error);
+      
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        toast.error('Network error - please check your connection');
+      } else {
+        toast.error(error.message || 'An error occurred. Please try again.');
+      }
+      
     } finally {
       setIsSending(false);
     }
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Basic input sanitization
+    let sanitizedValue = value;
+    if (name === 'name') {
+      // Remove any numbers from name field
+      sanitizedValue = value.replace(/[0-9]/g, '');
+    }
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: sanitizedValue 
+    }));
   };
-
-  // Filter education items
-  const filteredEducation = activeFilter === 'all' 
-    ? education 
-    : education.filter(item => item.type === activeFilter);
-
-  const counts = {
-    all: education.length,
-    education: education.filter(item => item.type === 'education').length,
-    certification: education.filter(item => item.type === 'certification').length,
-    achievement: education.filter(item => item.type === 'achievement').length,
-    publication: education.filter(item => item.type === 'publication').length
-  };
-
+  // ========================
+  // HELPER FUNCTIONS
+  // ========================
   const getIcon = (type: 'education' | 'certification' | 'achievement' | 'publication') => {
     switch (type) {
       case 'education': return <GraduationCap className="w-6 h-6 text-white" />;
@@ -385,6 +528,20 @@ const Index = () => {
       default: return 'bg-primary';
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show error toast if there was an error
+  if (error) {
+    toast.error(error);
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -435,28 +592,18 @@ const Index = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in text-center lg:text-left">
-              {isLoadingHero ? (
-                <div className="animate-pulse space-y-4">
-                  <div className="h-12 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-6 bg-gray-200 rounded w-full"></div>
-                  <div className="h-6 bg-gray-200 rounded w-5/6"></div>
-                </div>
-              ) : (
-                <>
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
-                    <span className="text-gradient-primary">Hello</span>,{" "}
-                    <TypeAnimation
-                      sequence={typeAnimationSequence}
-                      wrapper="span"
-                      speed={50}
-                      repeat={Infinity}
-                    />
-                  </h1>
-                  <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
-                    {heroContent.heroParagraph}
-                  </p>
-                </>
-              )}
+              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6">
+                <span className="text-gradient-primary">Hello</span>,{" "}
+                <TypeAnimation
+                  sequence={typeAnimationSequence}
+                  wrapper="span"
+                  speed={50}
+                  repeat={Infinity}
+                />
+              </h1>
+              <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
+                {heroContent.heroParagraph}
+              </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <a
                   href={heroContent.resume.url}
@@ -495,7 +642,7 @@ const Index = () => {
                 <div className="glass p-4 rounded-lg text-center hover-glow-subtle">
                   <Code className="w-8 h-8 mx-auto mb-2 text-primary" />
                   <h3 className="font-medium mb-1">Front-End</h3>
-                  <p className="text-xs text-muted-foreground">React & JavaScript</p>
+                  <p className="text-xs text-muted-foreground">React & Tailwind</p>
                 </div>
                 <div className="glass p-4 rounded-lg text-center hover-glow-subtle">
                   <GraduationCap className="w-8 h-8 mx-auto mb-2 text-primary" />
@@ -508,6 +655,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* About Section */}
       <section id="about" className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
@@ -554,7 +702,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold">Who I Am</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed">
-                {heroContent.about?.whoIAm || "Loading..."}
+                {heroContent.about?.whoIAm}
               </p>
             </motion.div>
 
@@ -587,7 +735,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold">My Expertise</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed">
-                {heroContent.about?.myExpertise || "Loading..."}
+                {heroContent.about?.myExpertise}
               </p>
             </motion.div>
 
@@ -620,7 +768,7 @@ const Index = () => {
                 <h3 className="text-2xl font-bold">My Mission</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed">
-                {heroContent.about?.myMission || "Loading..."}
+                {heroContent.about?.myMission}
               </p>
             </motion.div>
           </div>
@@ -651,25 +799,25 @@ const Index = () => {
               My <span className="text-primary">Journey</span>
             </h2>
             <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-              {heroContent.about?.myJourney || "Loading..."}
+              {heroContent.about?.myJourney}
             </div>
           </motion.div>
 
           <div className="pt-12 mb-16">
-            <motion.h2 
-              className="text-3xl md:text-4xl font-bold text-center mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              My <span className="text-primary">Skills</span>
-            </motion.h2>
-            <MarqueeSkills />
-          </div>
-        </div>
-      </section>
-
+              <motion.h2 
+                className="text-3xl md:text-4xl font-bold text-center mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                My <span className="text-primary">Skills</span>
+              </motion.h2>
+              <MarqueeSkills skills={skills} />
+            </div>
+            </div>
+          </section>
       
+      {/* Education Section */}
       <section id="education" className="py-20 bg-background/50">
         <div className="container mx-auto px-4">
           <motion.div
@@ -707,13 +855,6 @@ const Index = () => {
               onClick={() => setActiveFilter('certification')} 
               colorClass="bg-blue-500/20"
             />
-            {/* <FilterButton 
-              label="Achievements" 
-              count={counts.achievement}
-              isActive={activeFilter === 'achievement'} 
-              onClick={() => setActiveFilter('achievement')} 
-              colorClass="bg-amber-500/20"
-            /> */}
             <FilterButton 
               label="Publications" 
               count={counts.publication}
@@ -723,53 +864,60 @@ const Index = () => {
             />
           </div>
           
-          <div className="max-w-3xl mx-auto relative">
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/30 to-transparent"></div>
-            
-            <div className="space-y-8">
-              {filteredEducation.map((edu, index) => (
-                <motion.div 
-                  key={edu.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  id={edu.type}
-                  className={`glass p-6 rounded-lg relative transform transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(155,135,245,0.3)] ml-10`}
-                >
-                  <div className={`absolute -left-10 top-6 w-8 h-8 ${getIconBgClass(edu.type as 'education' | 'certification' | 'achievement' | 'publication')} rounded-full flex items-center justify-center`}>
-                    {getIcon(edu.type as 'education' | 'certification' | 'achievement' | 'publication')}
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center">
-                      <h3 className="text-xl font-bold">{edu.institution}</h3>
-                      <span className="ml-3 text-xs uppercase bg-white/20 px-2 py-1 rounded-full">
-                        {edu.type}
-                      </span>
-                    </div>
-                    <p className="text-primary">{edu.degree}</p>
-                    <p className="text-sm text-muted-foreground mb-2">{edu.period}</p>
-                    <p className="text-muted-foreground">
-                      {edu.description}
-                    </p>
-                    {edu.certificateLink && (
-                      <a 
-                        href={edu.certificateLink} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="inline-flex items-center gap-2 mt-3 text-primary hover:underline"
-                      >
-                        View <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+          {filteredEducation.length === 0 ? (
+            <div className="text-center py-12 glass rounded-lg">
+              <p className="text-muted-foreground">No education items found for this filter.</p>
             </div>
-          </div>
+          ) : (
+            <div className="max-w-3xl mx-auto relative">
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 via-primary/30 to-transparent"></div>
+              
+              <div className="space-y-8">
+                {filteredEducation.map((edu, index) => (
+                  <motion.div 
+                    key={edu.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    id={edu.type}
+                    className={`glass p-6 rounded-lg relative transform transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(155,135,245,0.3)] ml-10`}
+                  >
+                    <div className={`absolute -left-10 top-6 w-8 h-8 ${getIconBgClass(edu.type as 'education' | 'certification' | 'achievement' | 'publication')} rounded-full flex items-center justify-center`}>
+                      {getIcon(edu.type as 'education' | 'certification' | 'achievement' | 'publication')}
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center">
+                        <h3 className="text-xl font-bold">{edu.institution}</h3>
+                        <span className="ml-3 text-xs uppercase bg-white/20 px-2 py-1 rounded-full">
+                          {edu.type}
+                        </span>
+                      </div>
+                      <p className="text-primary">{edu.degree}</p>
+                      <p className="text-sm text-muted-foreground mb-2">{edu.period}</p>
+                      <p className="text-muted-foreground">
+                        {edu.description}
+                      </p>
+                      {edu.certificateLink && (
+                        <a 
+                          href={edu.certificateLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="inline-flex items-center gap-2 mt-3 text-primary hover:underline"
+                        >
+                          View <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
       
+      {/* Projects Section */}
       <section id="projects" className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
@@ -782,32 +930,36 @@ const Index = () => {
               My <span className="text-gradient-primary">Projects</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              A showcase of my work in cybersecurity, front-end development, and Arduino projects.
+              A showcase of my work in web development and other technical projects.
             </p>
           </motion.div>
           
           <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
               <motion.div
-                key={project.id}
+                key={project._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <ProjectCard 
+                  _id={project._id}
                   title={project.title}
                   description={project.description}
+                  technologies={project.technologies}
+                  liveUrl={project.liveUrl}
+                  githubUrl={project.githubUrl}
                   image={project.image}
-                  tags={project.tags}
-                  github={project.github}
-                  liveDemo={project.liveDemo}
+                  category={project.category}
                 />
               </motion.div>
             ))}
           </div>
         </div>
       </section>
-      
+
+      {/* Experience Section */}
+      {/* Experience Section */}
       <section id="experience" className="py-20 bg-background/50">
         <div className="container mx-auto px-4">
           <motion.div
@@ -824,164 +976,198 @@ const Index = () => {
             </p>
           </motion.div>
           
-          <div className="max-w-3xl mx-auto">
-            <div className="flex justify-center mb-8">
-              <div className="glass px-6 py-3 rounded-full flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-primary" />
-                <span className="font-medium">Professional Timeline</span>
-              </div>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
-            
-            {experiences.map((exp, index) => (
-              <motion.div
-                key={exp.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <ExperienceCard 
-                  company={exp.company}
-                  position={exp.position}
-                  period={exp.period}
-                  description={exp.description}
-                />
-              </motion.div>
-            ))}
-          </div>
+          ) : (
+            <div className="max-w-3xl mx-auto">
+              <div className="flex justify-center mb-8">
+                <div className="glass px-6 py-3 rounded-full flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-primary" />
+                  <span className="font-medium">Professional Timeline</span>
+                </div>
+              </div>
+              
+              {experiences.length === 0 ? (
+                <div className="text-center glass p-8 rounded-lg">
+                  <p className="text-muted-foreground">No experience entries found.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {experiences.map((exp, index) => (
+                    <motion.div
+                      key={exp._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <ExperienceCard
+                        _id={exp._id}
+                        company={exp.company}
+                        position={exp.position}
+                        location={exp.location}
+                        startDate={exp.startDate}
+                        endDate={exp.endDate}
+                        description={exp.description}
+                        achievements={exp.achievements}
+                        technologies={exp.technologies}
+                        isCurrentJob={exp.isCurrentJob}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
       
-        {/* Contact Section */}
-        <section id="contact" className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-16"
+      {/* Contact Section */}
+      <section id="contact" className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+              Let's <span className="text-gradient-primary">Connect</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Have a question or want to work together? Feel free to reach out!
+            </p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <motion.div 
+              className="glass p-8 rounded-lg"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                Let's <span className="text-gradient-primary">Connect</span>
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Have a question or want to work together? Feel free to reach out!
-              </p>
+              <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-2">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                  />
+                </div>
+                {/* Add Subject Field */}
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-medium mb-2">Subject</label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium mb-2">Message</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                  ></textarea>
+                </div>
+                {/* Rest of your form remains the same */}
+                <button
+                  type="submit"
+                  disabled={isSending}
+                  className={`w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover-glow flex items-center justify-center ${
+                    isSending ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isSending ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    'Send Message'
+                  )}
+                </button>
+              </form>
             </motion.div>
             
-            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-              <motion.div 
-                className="glass p-8 rounded-lg"
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-2">Name</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                    />
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex flex-col justify-center"
+            >
+              <div className="glass p-8 rounded-lg mb-8">
+                <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <Mail className="text-primary" />
+                    <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
+                      garvkamra24@gmail.com
+                    </a>
                   </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                    />
+                  <div className="flex items-center gap-4">
+                    <Github className="text-primary" />
+                    <a href="https://github.com/Securegarv20" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                      github.com/Securegarv20
+                    </a>
                   </div>
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium mb-2">Message</label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      rows={4}
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                    ></textarea>
+                  <div className="flex items-center gap-4">
+                    <Linkedin className="text-primary" />
+                    <a href="https://www.linkedin.com/in/garvkamra/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                      linkedin.com/in/garvkamra
+                    </a>
                   </div>
-                  <button
-                    type="submit"
-                    disabled={isSending}
-                    className={`w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover-glow flex items-center justify-center ${
-                      isSending ? 'opacity-75 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {isSending ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending...
-                      </>
-                    ) : (
-                      'Send Message'
-                    )}
-                  </button>
-                </form>
-              </motion.div>
+                </div>
+              </div>
               
-              <motion.div 
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex flex-col justify-center"
-              >
-                <div className="glass p-8 rounded-lg mb-8">
-                  <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <Mail className="text-primary" />
-                      <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
-                        garvkamra24@gmail.com
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Github className="text-primary" />
-                      <a href="https://github.com/Securegarv20" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                        github.com/Securegarv20
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Linkedin className="text-primary" />
-                      <a href="https://www.linkedin.com/in/garvkamra/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                        linkedin.com/in/garvkamra
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="glass p-8 rounded-lg">
-                  <h3 className="text-2xl font-bold mb-6">Let's Connect</h3>
-                  <p className="text-muted-foreground mb-6">
-                    I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
-                  </p>
-                  <a
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=garvkamra24@gmail.com&su=Let's%20Connect"
-                    target="_blank"
-                    className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg block text-center"
-                  >
-                    Schedule a call
-                  </a>
-                </div>
-              </motion.div>
-            </div>
+              <div className="glass p-8 rounded-lg">
+                <h3 className="text-2xl font-bold mb-6">Let's Connect</h3>
+                <p className="text-muted-foreground mb-6">
+                  I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
+                </p>
+                <a
+                  href="https://calendly.com/garvkamra24/lets-connect"
+                  target="_blank"
+                  className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg block text-center"
+                >
+                  Schedule a call
+                </a>
+              </div>
+            </motion.div>
           </div>
-        </section>
+        </div>
+      </section>
 
       <footer className="text-center text-sm text-muted-foreground py-6">
         © {new Date().getFullYear()} Garv Kamra. All rights reserved.
