@@ -637,17 +637,17 @@ const Index = () => {
                 <div className="glass p-4 rounded-lg text-center hover-glow-subtle">
                   <Shield className="w-8 h-8 mx-auto mb-2 text-primary" />
                   <h3 className="font-medium mb-1">Cybersecurity</h3>
-                  <p className="text-xs text-muted-foreground">CEH v12 Certified</p>
+                  <p className="text-xs text-muted-foreground">SOC L1 Aspirant | CEH v12, CND v3</p>
                 </div>
                 <div className="glass p-4 rounded-lg text-center hover-glow-subtle">
                   <Code className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium mb-1">Front-End</h3>
-                  <p className="text-xs text-muted-foreground">React & Tailwind</p>
+                  <h3 className="font-medium mb-1">Development</h3>
+                  <p className="text-xs text-muted-foreground">React, Tailwind, Express.js</p>
                 </div>
                 <div className="glass p-4 rounded-lg text-center hover-glow-subtle">
                   <GraduationCap className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium mb-1">Arduino</h3>
-                  <p className="text-xs text-muted-foreground">5+ Years Experience</p>
+                  <h3 className="font-medium mb-1">Hardware & IoT</h3>
+                  <p className="text-xs text-muted-foreground">Arduino, NodeMCU, Robotics</p>
                 </div>
               </div>
             </div>
