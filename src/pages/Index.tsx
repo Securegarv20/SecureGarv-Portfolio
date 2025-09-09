@@ -119,7 +119,7 @@ const Index = () => {
         setError(null);
         
         const headers = {
-          'x-api-key': import.meta.env.VITE_MAIN_API_KEY
+          'x-api-key': import.meta.env.VITE_PUBLIC_API_KEY
         };
         // Fetch all data in parallel
         const [contentRes, educationRes, projectsRes, experienceRes, skillsRes] = await Promise.all([
@@ -459,17 +459,19 @@ const Index = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_PUBLIC_API_KEY  // 👈 add public key
         },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          subject: formData.subject, // Include subject
+          subject: formData.subject,
           message: formData.message,
           isRead: false,
           isStarred: false,
           isArchived: false
         })
       });
+
 
       const backendData = await backendResponse.json();
 
