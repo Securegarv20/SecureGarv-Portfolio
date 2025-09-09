@@ -117,17 +117,14 @@ const Index = () => {
       try {
         setLoading(true);
         setError(null);
-        
-        const headers = {
-          'x-api-key': import.meta.env.VITE_PUBLIC_API_KEY
-        };
-        // Fetch all data in parallel
+
+        // Fetch all data in parallel (no headers needed now)
         const [contentRes, educationRes, projectsRes, experienceRes, skillsRes] = await Promise.all([
-          fetch(`${API_URL}/api/content`, { headers }),
-          fetch(`${API_URL}/api/education`, { headers }),
-          fetch(`${API_URL}/api/projects`, { headers }),
-          fetch(`${API_URL}/api/experience`, { headers }),
-          fetch(`${API_URL}/api/skills`, { headers })
+          fetch(`${API_URL}/api/content`),
+          fetch(`${API_URL}/api/education`),
+          fetch(`${API_URL}/api/projects`),
+          fetch(`${API_URL}/api/experience`),
+          fetch(`${API_URL}/api/skills`)
         ]);
 
         if (!contentRes.ok) throw new Error('Failed to fetch content');
