@@ -1171,8 +1171,8 @@ const Index = () => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <Mail className="text-primary" />
-                    <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
-                      garvkamra24@gmail.com
+                    <a href="mailto:securegarv@gmail.com" className="hover:text-primary transition-colors">
+                      securegarv@gmail.com
                     </a>
                   </div>
                   <div className="flex items-center gap-4">

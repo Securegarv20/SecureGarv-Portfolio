@@ -80,16 +80,17 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
           >
             {/* Article Header */}
             <header className="mb-12 text-center">
+              {/* Responsive Tags Container */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="flex justify-center gap-4 mb-6"
+                className="flex flex-wrap justify-center gap-2 mb-6 px-2"
               >
                 {post.tags.map(tag => (
                   <span 
                     key={tag}
-                    className="text-sm bg-primary/20 text-primary px-4 py-1.5 rounded-full border border-primary/30"
+                    className="text-xs sm:text-sm bg-primary/20 text-primary px-3 py-1.5 rounded-full border border-primary/30 whitespace-nowrap"
                   >
                     {tag}
                   </span>
@@ -100,7 +101,7 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight px-4"
               >
                 {post.title}
               </motion.h1>
@@ -109,7 +110,7 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto"
+                className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto px-4"
               >
                 {post.excerpt}
               </motion.p>
@@ -118,18 +119,18 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground"
+                className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground px-4"
               >
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   <span>{post.date}</span>
                 </div>
-                <div className="w-px h-4 bg-[#2d3748]"></div>
+                <div className="hidden sm:block w-px h-4 bg-[#2d3748]"></div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   <span>{post.readTime}</span>
                 </div>
-                <div className="w-px h-4 bg-[#2d3748]"></div>
+                <div className="hidden sm:block w-px h-4 bg-[#2d3748]"></div>
                 <div className="flex items-center gap-2">
                   <span>By Garv Kamra</span>
                 </div>
@@ -141,7 +142,7 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.7 }}
-              className="mb-12 rounded-2xl overflow-hidden"
+              className="mb-12 rounded-2xl overflow-hidden mx-4 sm:mx-0"
             >
               <img 
                 src={post.image} 
@@ -156,6 +157,7 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
               dangerouslySetInnerHTML={{ __html: post.content }}
+              className="px-4 sm:px-0"
             />
 
             {/* Article Footer */}
@@ -163,7 +165,7 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
-              className="mt-16 pt-8 border-t border-[#2d3748]"
+              className="mt-16 pt-8 border-t border-[#2d3748] mx-4 sm:mx-0"
             >
             </motion.footer>
           </motion.article>
