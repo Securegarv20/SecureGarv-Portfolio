@@ -165,32 +165,6 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
               transition={{ delay: 0.9 }}
               className="mt-16 pt-8 border-t border-[#2d3748]"
             >
-              {/* Author Bio */}
-              <div className="p-6 bg-[#1a1f3a] rounded-2xl border border-[#2d3748]">
-                <div className="flex items-start gap-4">
-                  <img
-                    src="/hero.png"
-                    alt="Garv Kamra"
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Garv Kamra</h3>
-                    <p className="text-muted-foreground mb-3">
-                      Cybersecurity professional & Frontend Developer. CEH v12 Certified. Passionate about 
-                      creating secure and beautiful digital experiences.
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <a
-                        href="#contact"
-                        onClick={onClose}
-                        className="text-primary hover:underline text-sm"
-                      >
-                        Get in touch
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </motion.footer>
           </motion.article>
         </div>
