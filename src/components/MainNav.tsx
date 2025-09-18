@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Mail, Linkedin } from 'lucide-react';
+import { Github, Mail, Linkedin, LibraryBig } from 'lucide-react';
 import MobileNav from "./MobileNav";
 
 const MainNav = () => {
@@ -40,7 +39,7 @@ const MainNav = () => {
   };
   
   return (
-    <header className={`fixed top-2 w-full z-50 py-4 transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
+    <header className={`fixed top-2 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
       <nav className="container mx-auto px-4 flex justify-between items-center">
         {/* Left Section - Availability Status */}
         <div className="flex items-center">
@@ -88,6 +87,9 @@ const MainNav = () => {
             <a href="#experience" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'experience')}>
               Experience
             </a>
+            <a href="#blog" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'blog')}>
+              Blogs
+            </a>
             <a href="#contact" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'contact')}>
               Contact
             </a>
@@ -95,7 +97,7 @@ const MainNav = () => {
         </div>
         
         {/* Right Section - Social Icons and Mobile Menu */}
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           {/* Social Icons - Desktop */}
           <div className="glass px-4 py-2 sm:px-6 sm:py-3 rounded-full items-center gap-4 hidden sm:flex">
             <a href="https://github.com/Securegarv20" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
@@ -104,13 +106,16 @@ const MainNav = () => {
             <a href="https://www.linkedin.com/in/garvkamra/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
               <Linkedin className="w-5 h-5" />
             </a>
+            <a href="https://www.amazon.in/stores/Garv-Kamra/author/B0FJWL3F7D/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              <LibraryBig className="w-5 h-5" />
+            </a>
             <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
               <Mail className="w-5 h-5" />
             </a>
           </div>
           
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          {/* Mobile Menu Button - Moved to the left of social icons container */}
+          <div className="lg:hidden ml-auto">
             <MobileNav />
           </div>
         </div>

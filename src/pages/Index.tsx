@@ -3,6 +3,9 @@ import { toast } from 'react-hot-toast';
 import { TypeAnimation } from 'react-type-animation';
 import { ArrowRight, Shield, Code, GraduationCap, User, Brain, Rocket, Briefcase, Mail, Github, Linkedin, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
+import { BookOpen } from "lucide-react";
+import BlogCard from "../components/BlogCard";
+import BlogModal from "../components/BlogModal";
 import MainNav from "../components/MainNav";
 import MarqueeSkills from "../components/MarqueeSkills";
 import ProjectCard from "../components/ProjectCard";
@@ -74,6 +77,17 @@ interface Skill {
   featured?: boolean;
 }
 
+interface BlogPost {
+  _id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  date: string;
+  readTime: string;
+  image: string;
+  tags: string[];
+}
+
 const Index = () => {
   // Refs for mouse effects
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -109,6 +123,14 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Blog modal state
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
+  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+
+  // ========================
+  // DATA FETCHING WITH RETRY
+  // ========================
   // ========================
   // DATA FETCHING
   // ========================
@@ -118,139 +140,64 @@ const Index = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch all data in parallel (no headers needed now)
-        const [contentRes, educationRes, projectsRes, experienceRes, skillsRes] = await Promise.all([
+        // Fetch all data in parallel
+        const [contentRes, educationRes, projectsRes, experienceRes, skillsRes, blogRes] = await Promise.all([
           fetch(`${API_URL}/api/content`),
           fetch(`${API_URL}/api/education`),
           fetch(`${API_URL}/api/projects`),
           fetch(`${API_URL}/api/experience`),
-          fetch(`${API_URL}/api/skills`)
+          fetch(`${API_URL}/api/skills`),
+          fetch(`${API_URL}/api/blog`) 
         ]);
 
+        // Check if all responses are OK
         if (!contentRes.ok) throw new Error('Failed to fetch content');
         if (!educationRes.ok) throw new Error('Failed to fetch education');
         if (!projectsRes.ok) throw new Error('Failed to fetch projects');
         if (!experienceRes.ok) throw new Error('Failed to fetch experience');
         if (!skillsRes.ok) throw new Error('Failed to fetch skills');
+        if (!blogRes.ok) throw new Error('Failed to fetch blog posts');
 
-        const [content, education, projects, experience, skills] = await Promise.all([
+        // Parse all responses
+        const [content, education, projects, experience, skills, blog] = await Promise.all([
           contentRes.json(),
           educationRes.json(),
           projectsRes.json(),
           experienceRes.json(),
-          skillsRes.json()
+          skillsRes.json(),
+          blogRes.json()
         ]);
 
+        // Set data from API
         setHeroContent(content);
         setEducation(education);
         setProjects(projects);
         setExperiences(experience);
         setSkills(skills);
+        setBlogPosts(blog);
 
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError('Failed to load data. Using default values.');
+        setError('Failed to load data. Please check your connection and try again.');
         
-        // Set mock data when in development or if API fails
+        // Set empty states instead of dummy data
         setHeroContent({
-          typewriterTexts: [
-            "I'm a Front-End Developer",
-            "I'm a Cybersecurity Professional",
-            "I'm CEH v12 Certified",
-            "I'm an Arduino Trainer",
-            "I'm a StartUp Founder"
-          ],
-          heroParagraph: "Hi, I'm Garv! I'm a Cybersecurity professional, certified in CEH v12 and CND v3, with hands-on experience in penetration testing, vulnerability assessment, and Frontend Development.",
-          resume: {
-            url: "https://drive.google.com/file/d/1KO0ShGA4uELdhCkClEfmTVnX6jJPaJmh/view?usp=drive_link",
-            fileName: "Garv_Kamra_Resume.pdf"
-          },
+          typewriterTexts: [],
+          heroParagraph: '',
+          resume: { url: '', fileName: '' },
           about: {
-            whoIAm: "Hey, I'm Garv Kamra, a passionate cybersecurity professional and front-end developer with a knack for creating secure and beautiful digital experiences.",
-            myExpertise: "I have hands-on experience in penetration testing, vulnerability assessment, and front-end development. Certified in CEH v12 and CND v3, I bring both technical skills and creative problem-solving to every project.",
-            myMission: "My mission is to keep learning and growing in the cybersecurity field while helping businesses create secure and user-friendly web applications. I believe in the power of technology to solve real-world problems.",
-            myJourney: "Ever since I was a kid, I've been fascinated by computers and how they work. My journey began with Arduino projects, evolved into web development, and eventually led me to cybersecurity where I found my true passion."
+            whoIAm: '',
+            myExpertise: '',
+            myMission: '',
+            myJourney: ''
           }
         });
-
-        setEducation([
-          {
-            id: '1',
-            type: 'education',
-            institution: 'University of Delhi',
-            degree: 'Bachelor of Science (Computer Science)',
-            period: '2020 - 2023',
-            description: 'Graduated with honors in Computer Science. Specialized in cybersecurity and web development.'
-          },
-          {
-            id: '2',
-            type: 'certification',
-            institution: 'EC-Council',
-            degree: 'Certified Ethical Hacker (CEH v12)',
-            period: '2023',
-            description: 'Certified in ethical hacking methodologies and penetration testing techniques.',
-            certificateLink: 'https://example.com/certificate'
-          }
-        ]);
-
-        setProjects([
-          {
-            _id: '1',
-            title: 'Secure Portfolio Website',
-            description: 'A personal portfolio website with security features and admin panel.',
-            technologies: ['React', 'Node.js', 'MongoDB'],
-            liveUrl: 'https://yourportfolio.com',
-            githubUrl: 'https://github.com/yourusername/portfolio',
-            image: '/project1.jpg',
-            category: 'Web Development'
-          },
-          {
-            _id: '2',
-            title: 'Vulnerability Scanner',
-            description: 'A web application vulnerability scanner built with Python.',
-            technologies: ['Python', 'Security', 'Flask'],
-            liveUrl: '',
-            githubUrl: 'https://github.com/yourusername/vuln-scanner',
-            image: '/project2.jpg',
-            category: 'Security'
-          }
-        ]);
-
-        setExperiences([
-          {
-            _id: '1',
-            company: 'Tech Solutions Inc.',
-            position: 'Frontend Developer & Security Specialist',
-            location: 'Remote',
-            startDate: '2022-01-01',
-            endDate: '2023-12-31',
-            description: 'Developed secure web applications and conducted vulnerability assessments.',
-            achievements: ['Implemented security measures', 'Improved frontend performance'],
-            technologies: ['React', 'Node.js', 'TypeScript'],
-            isCurrentJob: false
-          },
-          {
-            _id: '2',
-            company: 'Freelance',
-            position: 'Web Developer',
-            location: 'Remote',
-            startDate: '2020-01-01',
-            endDate: '2022-01-01',
-            description: 'Built custom websites for clients with a focus on security best practices.',
-            achievements: ['Delivered 10+ client projects', 'Implemented security audits'],
-            technologies: ['HTML', 'CSS', 'JavaScript'],
-            isCurrentJob: false
-          }
-        ]);
-
-        setSkills([
-          { _id: '1', name: 'React', category: 'Frontend', proficiency: 90, featured: true },
-          { _id: '2', name: 'TypeScript', category: 'Frontend', proficiency: 85, featured: false },
-          { _id: '3', name: 'Penetration Testing', category: 'Security', proficiency: 80, featured: false },
-          { _id: '4', name: 'Node.js', category: 'Backend', proficiency: 75, featured: true },
-          { _id: '5', name: 'Python', category: 'Backend', proficiency: 70, featured: true }
-        ]);
-
+        setEducation([]);
+        setProjects([]);
+        setExperiences([]);
+        setSkills([]);
+        setBlogPosts([]);
+        
       } finally {
         setLoading(false);
       }
@@ -961,7 +908,6 @@ const Index = () => {
       </section>
 
       {/* Experience Section */}
-      {/* Experience Section */}
       <section id="experience" className="py-20 bg-background/50">
         <div className="container mx-auto px-4">
           <motion.div
@@ -1020,6 +966,52 @@ const Index = () => {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+        </div>
+      </section>
+
+
+      {/* Blog Section */}
+      <section id="blog" className="py-20 relative">
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+              My <span className="text-gradient-primary">Blog</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Thoughts, tutorials, and insights on cybersecurity, development, and technology.
+            </p>
+          </motion.div>
+          
+          {blogPosts.length === 0 ? (
+            <div className="text-center py-12 glass rounded-lg">
+              <p className="text-muted-foreground">No blog posts yet. Check back soon!</p>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogPosts.map((post, index) => (
+                <motion.div
+                  key={post._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <BlogCard 
+                    post={post}
+                    onClick={() => {
+                      setSelectedBlog(post);
+                      setIsBlogModalOpen(true);
+                    }}
+                  />
+                </motion.div>
+              ))}
             </div>
           )}
         </div>
@@ -1174,6 +1166,15 @@ const Index = () => {
       <footer className="text-center text-sm text-muted-foreground py-6">
         © {new Date().getFullYear()} Garv Kamra. All rights reserved.
       </footer>
+          {isBlogModalOpen && selectedBlog && (
+      <BlogModal 
+        post={selectedBlog} 
+        onClose={() => {
+          setIsBlogModalOpen(false);
+          setSelectedBlog(null);
+        }} 
+      />
+    )}
     </div>
   );
 };

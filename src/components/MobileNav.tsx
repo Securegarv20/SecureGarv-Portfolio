@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Menu, X, Github, Mail, Linkedin } from 'lucide-react';
+import { Menu, X, Github, Mail, Linkedin,LibraryBig } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -37,10 +36,10 @@ const MobileNav = () => {
       {/* Mobile menu button */}
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        className="glass p-3 rounded-full mobile-menu-button"
+        className="glass p-3 rounded-full mobile-menu-button mr-3"
         aria-label="Toggle menu"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
       
       {/* Mobile sidebar */}
@@ -72,6 +71,9 @@ const MobileNav = () => {
             <Link to="/experience" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
               Experience
             </Link>
+            <Link to="/blog" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+              Blogs
+            </Link>
             <Link to="/contact" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
               Contact
             </Link>
@@ -83,6 +85,9 @@ const MobileNav = () => {
             </a>
             <a href="https://www.linkedin.com/in/garvkamra/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
               <Linkedin className="w-5 h-5" />
+            </a>
+            <a href="https://www.amazon.in/stores/Garv-Kamra/author/B0FJWL3F7D/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              <LibraryBig className="w-5 h-5" />
             </a>
             <a href="mailto:garvkamra24@gmail.com" className="hover:text-primary transition-colors">
               <Mail className="w-5 h-5" />

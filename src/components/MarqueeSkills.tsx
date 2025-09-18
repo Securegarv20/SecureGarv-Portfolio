@@ -11,7 +11,15 @@ interface MarqueeSkillsProps {
 
 const MarqueeSkills = ({ skills }: MarqueeSkillsProps) => {
   return (
-    <section className="py-5 px-6 max-w-4xl mx-auto">
+    <section className="py-12 px-6 max-w-4xl mx-auto">
+      {/* <motion.h2
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-3xl font-bold text-gray-100 mb-8 text-center"
+      >
+        My <span className="text-purple-400">Skills</span>
+      </motion.h2> */}
+
       <div className="flex flex-wrap justify-center gap-4">
         {skills.map((skill, i) => (
           <motion.span
