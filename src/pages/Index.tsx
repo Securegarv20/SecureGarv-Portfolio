@@ -88,6 +88,8 @@ interface BlogPost {
   tags: string[];
 }
 
+
+
 const Index = () => {
   // Refs for mouse effects
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -129,9 +131,6 @@ const Index = () => {
   const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
 
   // ========================
-  // DATA FETCHING WITH RETRY
-  // ========================
-  // ========================
   // DATA FETCHING
   // ========================
   useEffect(() => {
@@ -159,7 +158,7 @@ const Index = () => {
         if (!blogRes.ok) throw new Error('Failed to fetch blog posts');
 
         // Parse all responses
-        const [content, education, projects, experience, skills, blog] = await Promise.all([
+        const [content, education, projects, experience, skills, blogData] = await Promise.all([
           contentRes.json(),
           educationRes.json(),
           projectsRes.json(),
@@ -174,7 +173,16 @@ const Index = () => {
         setProjects(projects);
         setExperiences(experience);
         setSkills(skills);
-        setBlogPosts(blog);
+        
+        // Handle blog data format (could be array or object with posts property)
+        if (Array.isArray(blogData)) {
+          setBlogPosts(blogData);
+        } else if (blogData && Array.isArray(blogData.posts)) {
+          setBlogPosts(blogData.posts);
+        } else {
+          console.warn('Unexpected blog data format:', blogData);
+          setBlogPosts([]);
+        }
 
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -974,7 +982,6 @@ const Index = () => {
 
       {/* Blog Section */}
       <section id="blog" className="py-20 relative">
-        
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -990,30 +997,68 @@ const Index = () => {
             </p>
           </motion.div>
           
-          {blogPosts.length === 0 ? (
-            <div className="text-center py-12 glass rounded-lg">
-              <p className="text-muted-foreground">No blog posts yet. Check back soon!</p>
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post, index) => (
-                <motion.div
-                  key={post._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <BlogCard 
-                    post={post}
-                    onClick={() => {
-                      setSelectedBlog(post);
-                      setIsBlogModalOpen(true);
-                    }}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          )}
+          {/* Handle different response formats */}
+          {(() => {
+            // Debug what we received
+            console.log('Blog API response:', blogPosts);
+            
+            // Extract posts from different possible response formats
+            let postsArray = [];
+            
+            if (Array.isArray(blogPosts)) {
+              postsArray = blogPosts;
+            } else if (
+              blogPosts &&
+              typeof blogPosts === 'object' &&
+              !Array.isArray(blogPosts)
+            ) {
+              // Handle different backend response formats
+              if (
+                'posts' in blogPosts &&
+                Array.isArray((blogPosts as { posts?: unknown }).posts)
+              ) {
+                postsArray = (blogPosts as { posts: unknown[] }).posts;
+              } else if (
+                'data' in blogPosts &&
+                Array.isArray((blogPosts as { data?: unknown }).data)
+              ) {
+                postsArray = (blogPosts as { data: unknown[] }).data;
+              } else if (
+                'items' in blogPosts &&
+                Array.isArray((blogPosts as { items?: unknown }).items)
+              ) {
+                postsArray = (blogPosts as { items: unknown[] }).items;
+              }
+            }
+            
+            return postsArray.length === 0 ? (
+              <div className="text-center py-12 glass rounded-lg">
+                <p className="text-muted-foreground">No blog posts yet. Check back soon!</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {postsArray
+                  .filter(post => post && typeof post === 'object')
+                  .map((post, index) => (
+                    <motion.div
+                      key={post._id || `blog-${index}-${Date.now()}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <BlogCard 
+                        post={post}
+                        onClick={() => {
+                          setSelectedBlog(post);
+                          setIsBlogModalOpen(true);
+                        }}
+                      />
+                    </motion.div>
+                  ))
+                }
+              </div>
+            );
+          })()}
         </div>
       </section>
       
