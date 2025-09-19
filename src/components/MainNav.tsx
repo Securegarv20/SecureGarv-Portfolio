@@ -116,7 +116,7 @@ const MainNav = () => {
           
           {/* Mobile Menu Button - Moved to the left of social icons container */}
           <div className="lg:hidden ml-auto">
-            <MobileNav />
+            <MobileNav scrollToSection={scrollToSection} />
           </div>
         </div>
       </nav>

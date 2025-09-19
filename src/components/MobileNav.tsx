@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Github, Mail, Linkedin,LibraryBig } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, X, Github, Mail, Linkedin, LibraryBig } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const MobileNav = () => {
+const MobileNav = ({ scrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
   
   // Close sidebar when clicking outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+    const handleClickOutside = (e) => {
+      const target = e.target;
       if (isOpen && !target.closest('.mobile-sidebar') && !target.closest('.mobile-menu-button')) {
         setIsOpen(false);
       }
@@ -30,6 +29,26 @@ const MobileNav = () => {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
+
+  // Handle navigation click
+  const handleNavClick = (e, section) => {
+    e.preventDefault();
+    setIsOpen(false);
+    
+    // Use the scrollToSection function passed from parent
+    if (scrollToSection) {
+      scrollToSection(e, section);
+    } else {
+      // Fallback implementation if scrollToSection isn't passed
+      const element = document.getElementById(section);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      // Update URL hash
+      window.location.hash = section;
+    }
+  };
 
   return (
     <>
@@ -56,27 +75,27 @@ const MobileNav = () => {
           </div>
           
           <nav className="flex flex-col gap-6 mb-auto">
-            <Link to="/" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            <a href="#home" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'home')}>
               Home
-            </Link>
-            <Link to="/about" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            </a>
+            <a href="#about" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'about')}>
               About
-            </Link>
-            <Link to="/education" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            </a>
+            <a href="#education" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'education')}>
               Education
-            </Link>
-            <Link to="/projects" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            </a>
+            <a href="#projects" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'projects')}>
               Projects
-            </Link>
-            <Link to="/experience" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            </a>
+            <a href="#experience" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'experience')}>
               Experience
-            </Link>
-            <Link to="/blog" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            </a>
+            <a href="#blog" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'blog')}>
               Blogs
-            </Link>
-            <Link to="/contact" className="text-lg hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+            </a>
+            <a href="#contact" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'contact')}>
               Contact
-            </Link>
+            </a>
           </nav>
           
           <div className="glass p-4 rounded-xl flex justify-center gap-6">
