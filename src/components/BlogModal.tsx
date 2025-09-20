@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { X, Calendar, Clock, ArrowLeft, Share, Link as LinkIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface BlogPost {
   _id: string;
@@ -19,6 +19,8 @@ interface BlogModalProps {
 }
 
 const BlogModal = ({ post, onClose }: BlogModalProps) => {
+  const [isCopied, setIsCopied] = useState(false);
+
   // Prevent background scrolling when modal is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -35,6 +37,46 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/blog/${post._id}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          text: post.excerpt,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+        // Fallback to copy if share fails
+        await copyToClipboard(shareUrl);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.log('Error copying to clipboard:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -60,13 +102,33 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
               <span className="hidden sm:inline">Back to Portfolio</span>
             </button>
             
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-[#2d3748] transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
+                aria-label="Share this post"
+              >
+                {isCopied ? (
+                  <>
+                    <span className="text-sm">Copied!</span>
+                    <LinkIcon className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    <span className="text-sm">Share</span>
+                    <Share className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-[#2d3748] transition-colors text-muted-foreground hover:text-foreground"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </motion.header>
 

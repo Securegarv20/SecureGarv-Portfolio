@@ -14,30 +14,31 @@ interface BlogPost {
 }
 
 const BlogPostWrapper = () => {
-  const { postId } = useParams<{ postId: string }>();
+  const { _id } = useParams<{ _id: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
-      try {
-        const response = await fetch(`/api/blog/${postId}`);
-        if (!response.ok) throw new Error('Post not found');
-        
-        const postData = await response.json();
-        setPost(postData);
-      } catch (error) {
-        console.error('Error fetching blog post:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        try {
+            // Note: using /api/blog/:id for the API call
+            const response = await fetch(`/api/blog/${_id}`);
+            if (!response.ok) throw new Error('Post not found');
+            
+            const postData = await response.json();
+            setPost(postData);
+        } catch (error) {
+            console.error('Error fetching blog post:', error);
+        } finally {
+            setLoading(false);
+        }
+        };
 
-    if (postId) {
+    if (_id) {
       fetchPost();
     }
-  }, [postId]);
+  }, [_id]);
 
   const handleClose = () => {
     // Go back to homepage and scroll to blog section
