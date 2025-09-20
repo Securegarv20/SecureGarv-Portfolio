@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import BlogModal from "@/components/BlogModal";
 import { BlogPost } from "@/components/BlogCard";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const BlogPostWrapper = () => {
   const { slug } = useParams<{ slug: string }>(); 
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const BlogPostWrapper = () => {
     const fetchPost = async () => {
       try {
         // Fetch by slug instead of ID
-        const response = await fetch(`/api/blog/${slug}`);
+        const response = await fetch(`${API_URL}/api/blog/${slug}`);
         if (!response.ok) throw new Error('Post not found');
         
         const postData = await response.json();
