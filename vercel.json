@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/blog/:slug",
-      "destination": "https://api.securegarv.me/blog/:slug"
+      "source": "/blog/:id",
+      "destination": "/index.html"
     },
     {
       "source": "/(.*)",
@@ -13,8 +13,14 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" }
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
       ]
     }
   ]
