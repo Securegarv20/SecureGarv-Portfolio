@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useMemo } from "react";
+import { useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { TypeAnimation } from 'react-type-animation';
 import { ArrowRight, Shield, Code, GraduationCap, User, Brain, Rocket, Briefcase, Mail, Github, Linkedin, ExternalLink } from "lucide-react";
@@ -91,6 +92,10 @@ interface BlogPost {
 
 
 const Index = () => {
+
+  const location = useLocation();
+  const blogSectionRef = useRef<HTMLDivElement>(null);
+
   // Refs for mouse effects
   const observerRef = useRef<IntersectionObserver | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -118,6 +123,8 @@ const Index = () => {
     heroParagraph: '',
     resume: { url: '', fileName: '' }
   });
+
+  
   const [education, setEducation] = useState<EducationItem[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -209,10 +216,21 @@ const Index = () => {
       } finally {
         setLoading(false);
       }
+        
     };
-
     fetchData();
   }, []);
+
+  // ========================
+  // SCROLL TO BLOG SECTION
+  // ========================
+  useEffect(() => {
+    if (location.state?.scrollToBlog && blogSectionRef.current) {
+      blogSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      // Clear the state to prevent scrolling on every render
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Generate typewriter animation sequence
   const typeAnimationSequence = useMemo(() => {
