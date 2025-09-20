@@ -28,8 +28,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/blog/:postId" element={<BlogPostWrapper />} /> {/* Add this line */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/blog/:slug" element={<BlogPostWrapper />} /> 
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

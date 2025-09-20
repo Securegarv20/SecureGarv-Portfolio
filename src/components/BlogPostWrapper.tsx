@@ -1,44 +1,36 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import BlogModal from './BlogModal';
-
-interface BlogPost {
-  _id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  date: string;
-  readTime: string;
-  image: string;
-  tags: string[];
-}
+// components/BlogPostWrapper.tsx
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react"; 
+import { useNavigate } from "react-router-dom";
+import BlogModal from "@/components/BlogModal";
+import { BlogPost } from "@/components/BlogCard";
 
 const BlogPostWrapper = () => {
-  const { _id } = useParams<{ _id: string }>();
+  const { slug } = useParams<{ slug: string }>(); 
   const navigate = useNavigate();
-  const [post, setPost] = useState<BlogPost | null>(null);
+  const [post, setPost] = useState<BlogPost| null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
-        try {
-            // Note: using /api/blog/:id for the API call
-            const response = await fetch(`/api/blog/${_id}`);
-            if (!response.ok) throw new Error('Post not found');
-            
-            const postData = await response.json();
-            setPost(postData);
-        } catch (error) {
-            console.error('Error fetching blog post:', error);
-        } finally {
-            setLoading(false);
-        }
-        };
+      try {
+        // Fetch by slug instead of ID
+        const response = await fetch(`/api/blog/${slug}`);
+        if (!response.ok) throw new Error('Post not found');
+        
+        const postData = await response.json();
+        setPost(postData);
+      } catch (error) {
+        console.error('Error fetching blog post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (_id) {
+    if (slug) {
       fetchPost();
     }
-  }, [_id]);
+  }, [slug]);
 
   const handleClose = () => {
     // Go back to homepage and scroll to blog section

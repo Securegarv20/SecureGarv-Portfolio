@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, ArrowLeft, Share, Link as LinkIcon } from "lucide-react";
+import { X, Calendar, Clock, ArrowLeft, Link as LinkIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface BlogPost {
@@ -38,37 +38,19 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
-  const handleShare = async () => {
+  const handleCopyLink = async () => {
+    // Use the direct URL (without hash) for sharing
     const shareUrl = `${window.location.origin}/blog/${post._id}`;
     
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: post.title,
-          text: post.excerpt,
-          url: shareUrl,
-        });
-      } catch (error) {
-        console.log('Error sharing:', error);
-        // Fallback to copy if share fails
-        await copyToClipboard(shareUrl);
-      }
-    } else {
-      // Fallback: copy to clipboard
-      await copyToClipboard(shareUrl);
-    }
-  };
-
-  const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(shareUrl);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
       console.log('Error copying to clipboard:', error);
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
-      textArea.value = text;
+      textArea.value = shareUrl;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
@@ -104,9 +86,9 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
             
             <div className="flex items-center gap-3">
               <button
-                onClick={handleShare}
+                onClick={handleCopyLink}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
-                aria-label="Share this post"
+                aria-label="Copy link to this post"
               >
                 {isCopied ? (
                   <>
@@ -115,8 +97,8 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
                   </>
                 ) : (
                   <>
-                    <span className="text-sm">Share</span>
-                    <Share className="w-4 h-4" />
+                    <span className="text-sm">Copy Link</span>
+                    <LinkIcon className="w-4 h-4" />
                   </>
                 )}
               </button>

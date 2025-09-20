@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Calendar, Clock, Eye } from "lucide-react";
 
-interface BlogPost {
+export interface BlogPost {
   _id: string;
   title: string;
   excerpt: string;
