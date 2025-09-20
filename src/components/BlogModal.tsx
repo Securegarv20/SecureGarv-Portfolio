@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, ArrowLeft, Link as LinkIcon } from "lucide-react";
+import { X, Calendar, Clock, ArrowLeft, Link as LinkIcon, Share } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface BlogPost {
@@ -93,12 +93,12 @@ const BlogModal = ({ post, onClose }: BlogModalProps) => {
                 {isCopied ? (
                   <>
                     <span className="text-sm">Copied!</span>
-                    <LinkIcon className="w-4 h-4" />
+                    <Share className="w-4 h-4" />
                   </>
                 ) : (
                   <>
-                    <span className="text-sm">Copy Link</span>
-                    <LinkIcon className="w-4 h-4" />
+                    <span className="text-sm">Share</span>
+                    <Share className="w-4 h-4" />
                   </>
                 )}
               </button>
