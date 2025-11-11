@@ -18,69 +18,45 @@ interface Review {
 }
 
 interface FeedbackSectionProps {
-  API_URL: string;
+  reviews: Review[];
 }
 
-const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
+const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
   const [activeReview, setActiveReview] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fetch reviews from backend
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${API_URL}/api/reviews`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch reviews');
-        }
-        
-        const data = await response.json();
-        setReviews(data);
-      } catch (err) {
-        console.error('Error fetching reviews:', err);
-        setError('Failed to load reviews');
-        // No fallback data - we'll show empty state
-        setReviews([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReviews();
-  }, [API_URL]);
+  // Filter only active and featured reviews for display
+  const displayReviews = reviews.filter(review => 
+    review.isActive && review.featured
+  );
 
   // Auto-scroll functionality
   useEffect(() => {
-    if (!isAutoPlaying || reviews.length === 0) return;
+    if (!isAutoPlaying || displayReviews.length === 0) return;
 
     const interval = setInterval(() => {
-      setActiveReview((prev) => (prev + 1) % reviews.length);
+      setActiveReview((prev) => (prev + 1) % displayReviews.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, reviews.length]);
+  }, [isAutoPlaying, displayReviews.length]);
 
   const nextReview = () => {
-    if (reviews.length === 0) return;
+    if (displayReviews.length === 0) return;
     setIsAutoPlaying(false);
-    setActiveReview((prev) => (prev + 1) % reviews.length);
+    setActiveReview((prev) => (prev + 1) % displayReviews.length);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const prevReview = () => {
-    if (reviews.length === 0) return;
+    if (displayReviews.length === 0) return;
     setIsAutoPlaying(false);
-    setActiveReview((prev) => (prev - 1 + reviews.length) % reviews.length);
+    setActiveReview((prev) => (prev - 1 + displayReviews.length) % displayReviews.length);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const goToReview = (index: number) => {
-    if (reviews.length === 0) return;
+    if (displayReviews.length === 0) return;
     setIsAutoPlaying(false);
     setActiveReview(index);
     setTimeout(() => setIsAutoPlaying(true), 10000);
@@ -104,27 +80,7 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
     );
   };
 
-  if (loading) {
-    return (
-      <section id="testimonials" className="py-20 relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-12 w-64 mx-auto mb-4 rounded"></div>
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-6 w-96 mx-auto mb-16 rounded"></div>
-          </div>
-          <div className="max-w-4xl mx-auto glass p-12 rounded-2xl animate-pulse">
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-6 w-32 mb-6 rounded"></div>
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-4 w-full mb-2 rounded"></div>
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-4 w-5/6 mb-2 rounded"></div>
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-4 w-4/6 mb-8 rounded"></div>
-            <div className="animate-pulse bg-gray-300 dark:bg-gray-700 h-6 w-48 rounded"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (reviews.length === 0) {
+  if (displayReviews.length === 0) {
     return (
       <section id="testimonials" className="py-20 relative overflow-hidden">
         {/* Background Elements */}
@@ -181,16 +137,6 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
     );
   }
 
-  if (error) {
-    return (
-      <section id="testimonials" className="py-20 relative overflow-hidden">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-red-500">{error}</p>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section id="testimonials" className="py-20 relative overflow-hidden">
       {/* Background Elements */}
@@ -221,7 +167,7 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
             {/* Navigation Arrows */}
             <button
               onClick={prevReview}
-              disabled={reviews.length <= 1}
+              disabled={displayReviews.length <= 1}
               className="absolute -left-4 md:-left-12 top-1/2 transform -translate-y-1/2 glass p-3 rounded-full hover-glow transition-all duration-300 hover:scale-110 z-20 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Previous testimonial"
             >
@@ -232,7 +178,7 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
 
             <button
               onClick={nextReview}
-              disabled={reviews.length <= 1}
+              disabled={displayReviews.length <= 1}
               className="absolute -right-4 md:-right-12 top-1/2 transform -translate-y-1/2 glass p-3 rounded-full hover-glow transition-all duration-300 hover:scale-110 z-20 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Next testimonial"
             >
@@ -267,30 +213,30 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
                 <div className="relative z-10">
                   {/* Rating and Project Type */}
                   <div className="flex items-center justify-between mb-6">
-                    <StarRating rating={reviews[activeReview].rating} />
+                    <StarRating rating={displayReviews[activeReview].rating} />
                     <span className="text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
-                      {reviews[activeReview].projectType}
+                      {displayReviews[activeReview].projectType}
                     </span>
                   </div>
 
                   {/* Testimonial Text */}
                   <blockquote className="mb-8">
                     <p className="text-lg md:text-xl text-foreground/90 leading-relaxed font-light">
-                      "{reviews[activeReview].text}"
+                      "{displayReviews[activeReview].text}"
                     </p>
                   </blockquote>
 
                   {/* Client Info */}
                   <div className="pt-6 border-t border-white/10">
                     <h4 className="font-semibold text-foreground text-lg mb-1">
-                      {reviews[activeReview].name}
+                      {displayReviews[activeReview].name}
                     </h4>
                     <p className="text-primary font-medium">
-                      {reviews[activeReview].position}
+                      {displayReviews[activeReview].position}
                     </p>
-                    {reviews[activeReview].company && (
+                    {displayReviews[activeReview].company && (
                       <p className="text-muted-foreground">
-                        {reviews[activeReview].company}
+                        {displayReviews[activeReview].company}
                       </p>
                     )}
                   </div>
@@ -299,9 +245,9 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
             </AnimatePresence>
 
             {/* Indicators */}
-            {reviews.length > 1 && (
+            {displayReviews.length > 1 && (
               <div className="flex justify-center mt-8 gap-2">
-                {reviews.map((_, index) => (
+                {displayReviews.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToReview(index)}

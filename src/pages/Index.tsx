@@ -89,6 +89,20 @@ interface BlogPost {
   tags: string[];
 }
 
+interface Review {
+  _id: string;
+  name: string;
+  position: string;
+  company?: string;
+  rating: number;
+  text: string;
+  projectType: string;
+  isActive: boolean;
+  featured: boolean;
+  order: number;
+  createdAt: string;
+}
+
 
 
 const Index = () => {
@@ -137,6 +151,8 @@ const Index = () => {
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
   const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
 
+  const [reviews, setReviews] = useState<Review[]>([]);
+
   // ========================
   // DATA FETCHING
   // ========================
@@ -147,13 +163,14 @@ const Index = () => {
         setError(null);
 
         // Fetch all data in parallel
-        const [contentRes, educationRes, projectsRes, experienceRes, skillsRes, blogRes] = await Promise.all([
+        const [contentRes, educationRes, projectsRes, experienceRes, skillsRes, blogRes, reviewsRes] = await Promise.all([
           fetch(`${API_URL}/api/content`),
           fetch(`${API_URL}/api/education`),
           fetch(`${API_URL}/api/projects`),
           fetch(`${API_URL}/api/experience`),
           fetch(`${API_URL}/api/skills`),
-          fetch(`${API_URL}/api/blog`) 
+          fetch(`${API_URL}/api/blog`),
+          fetch(`${API_URL}/api/reviews`)
         ]);
 
         // Check if all responses are OK
@@ -163,15 +180,17 @@ const Index = () => {
         if (!experienceRes.ok) throw new Error('Failed to fetch experience');
         if (!skillsRes.ok) throw new Error('Failed to fetch skills');
         if (!blogRes.ok) throw new Error('Failed to fetch blog posts');
+        if (!reviewsRes.ok) throw new Error('Failed to fetch reviews');
 
         // Parse all responses
-        const [content, education, projects, experience, skills, blogData] = await Promise.all([
+        const [content, education, projects, experience, skills, blogData, reviewsData] = await Promise.all([
           contentRes.json(),
           educationRes.json(),
           projectsRes.json(),
           experienceRes.json(),
           skillsRes.json(),
-          blogRes.json()
+          blogRes.json(),
+          reviewsRes.json()
         ]);
 
         // Set data from API
@@ -180,6 +199,7 @@ const Index = () => {
         setProjects(projects);
         setExperiences(experience);
         setSkills(skills);
+        setReviews(reviewsData.reviews || reviewsData || [])
         
         // Handle blog data format (could be array or object with posts property)
         if (Array.isArray(blogData)) {
@@ -212,6 +232,7 @@ const Index = () => {
         setExperiences([]);
         setSkills([]);
         setBlogPosts([]);
+        setReviews([]);
         
       } finally {
         setLoading(false);
@@ -1083,7 +1104,7 @@ const Index = () => {
 
       
       {/* Testimonials Section */}
-        <FeedbackSection API_URL={"API_URL"} />
+        <FeedbackSection reviews={reviews} />
       
       {/* Contact Section */}
       <section id="contact" className="py-20">
