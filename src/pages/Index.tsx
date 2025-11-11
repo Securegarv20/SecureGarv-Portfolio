@@ -4,7 +4,6 @@ import { toast } from 'react-hot-toast';
 import { TypeAnimation } from 'react-type-animation';
 import { ArrowRight, Shield, Code, GraduationCap, User, Brain, Rocket, Briefcase, Mail, Github, Linkedin, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import { BookOpen } from "lucide-react";
 import BlogCard from "../components/BlogCard";
 import BlogModal from "../components/BlogModal";
 import MainNav from "../components/MainNav";
@@ -1084,7 +1083,7 @@ const Index = () => {
 
       
       {/* Testimonials Section */}
-        <FeedbackSection />
+        <FeedbackSection API_URL={"API_URL"} />
       
       {/* Contact Section */}
       <section id="contact" className="py-20">
