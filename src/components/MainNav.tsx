@@ -90,7 +90,7 @@ const MainNav = () => {
             <a href="#blog" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'blog')}>
               Blogs
             </a>
-            <a href="#testimonials" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'reviews')}>
+            <a href="#testimonials" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'testimonials')}>
               Testimonials
             </a>
             <a href="#contact" className="hover:text-primary transition-colors" onClick={(e) => scrollToSection(e, 'contact')}>
