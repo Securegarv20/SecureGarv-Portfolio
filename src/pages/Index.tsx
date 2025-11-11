@@ -13,6 +13,7 @@ import ProjectCard from "../components/ProjectCard";
 import ExperienceCard from "../components/ExperienceCard";
 import EducationCard from "../components/EducationCard";
 import FilterButton from "../components/FilterButton";
+import FeedbackSection from "../components/FeedbackSection";
 
 // API configuration - Update with your backend URL
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -933,6 +934,7 @@ const Index = () => {
         </div>
       </section>
 
+
       {/* Experience Section */}
       <section id="experience" className="py-20 bg-background/50">
         <div className="container mx-auto px-4">
@@ -1079,6 +1081,10 @@ const Index = () => {
           })()}
         </div>
       </section>
+
+      
+      {/* Testimonials Section */}
+        <FeedbackSection />
       
       {/* Contact Section */}
       <section id="contact" className="py-20">
@@ -1155,7 +1161,6 @@ const Index = () => {
                     className="w-full px-4 py-2 bg-background border rounded-lg focus:ring-2 focus:ring-primary outline-none"
                   ></textarea>
                 </div>
-                {/* Rest of your form remains the same */}
                 <button
                   type="submit"
                   disabled={isSending}
