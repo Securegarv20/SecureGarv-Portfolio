@@ -199,7 +199,7 @@ const Index = () => {
         setProjects(projects);
         setExperiences(experience);
         setSkills(skills);
-        setReviews(reviewsData.reviews || reviewsData || [])
+        setReviews(reviewsData.reviews || []);
         
         // Handle blog data format (could be array or object with posts property)
         if (Array.isArray(blogData)) {
