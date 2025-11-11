@@ -93,6 +93,9 @@ const MobileNav = ({ scrollToSection }) => {
             <a href="#blog" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'blog')}>
               Blogs
             </a>
+            <a href="#testimonials" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'reviews')}>
+              Testimonials
+            </a>
             <a href="#contact" className="text-lg hover:text-primary transition-colors" onClick={(e) => handleNavClick(e, 'contact')}>
               Contact
             </a>

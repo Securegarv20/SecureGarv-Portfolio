@@ -104,7 +104,7 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-              Client <span className="text-gradient-primary">Feedback</span>
+              Client <span className="text-gradient-primary">Testimonials</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
               What clients say about my web development services and project delivery
@@ -124,7 +124,7 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
                 No Reviews Yet
               </h3>
               <p className="text-muted-foreground text-lg mb-6">
-                Client feedback will appear here once reviews are added.
+                Client Testimonials will appear here once reviews are added.
               </p>
               <div className="flex justify-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
@@ -160,7 +160,7 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-            Client <span className="text-gradient-primary">Feedback</span>
+            Client <span className="text-gradient-primary">Testimonials</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             What clients say about my web development services and project delivery
@@ -220,9 +220,16 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
                   {/* Rating and Project Type */}
                   <div className="flex items-center justify-between mb-6">
                     <StarRating rating={displayReviews[activeReview].rating} />
-                    <span className="text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
-                      {displayReviews[activeReview].projectType}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {displayReviews[activeReview].featured && (
+                        <span className="text-xs px-2 py-1 bg-yellow-400/20 text-yellow-600 dark:text-yellow-400 border border-yellow-400/30 rounded-full font-medium">
+                          ⭐ Featured
+                        </span>
+                      )}
+                      <span className="text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
+                        {displayReviews[activeReview].projectType}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Testimonial Text */}
