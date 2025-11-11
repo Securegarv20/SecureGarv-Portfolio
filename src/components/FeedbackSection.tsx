@@ -25,10 +25,15 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
   const [activeReview, setActiveReview] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Filter only active and featured reviews for display
+  // Filter only active reviews for display
   const displayReviews = reviews.filter(review => 
-    review.isActive && review.featured
+    review.isActive
   );
+
+  // ADD THESE CONSOLE LOGS:
+  console.log('All reviews:', reviews);
+  console.log('Display reviews (active & featured):', displayReviews);
+  console.log('Review featured status:', reviews[0]?.featured);
 
   // Auto-scroll functionality
   useEffect(() => {
