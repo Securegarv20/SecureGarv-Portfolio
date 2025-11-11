@@ -33,7 +33,7 @@ const FeedbackSection = ({ API_URL }: FeedbackSectionProps) => {
     const fetchReviews = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/api/reviews/public/featured?limit=10`);
+        const response = await fetch(`${API_URL}/api/reviews`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch reviews');
