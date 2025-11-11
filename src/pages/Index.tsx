@@ -101,6 +101,7 @@ interface Review {
   featured: boolean;
   order: number;
   createdAt: string;
+  websiteUrl?: string;
 }
 
 
@@ -1040,7 +1041,7 @@ const Index = () => {
           {/* Handle different response formats */}
           {(() => {
             // Debug what we received
-            console.log('Blog API response:', blogPosts);
+            // console.log('Blog API response:', blogPosts);
             
             // Extract posts from different possible response formats
             let postsArray = [];

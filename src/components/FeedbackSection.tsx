@@ -1,6 +1,6 @@
 // components/FeedbackSection.tsx
 import { useState, useEffect } from 'react';
-import { Star, Quote, MessageCircle } from 'lucide-react';
+import { Star, Quote, MessageCircle, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Review {
@@ -15,6 +15,7 @@ interface Review {
   featured: boolean;
   order: number;
   createdAt: string;
+  websiteUrl?: string;
 }
 
 interface FeedbackSectionProps {
@@ -31,9 +32,9 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
   );
 
   // ADD THESE CONSOLE LOGS:
-  console.log('All reviews:', reviews);
-  console.log('Display reviews (active & featured):', displayReviews);
-  console.log('Review featured status:', reviews[0]?.featured);
+  // console.log('All reviews:', reviews);
+  // console.log('Display reviews (active & featured):', displayReviews);
+  // console.log('Review featured status:', reviews[0]?.featured);
 
   // Auto-scroll functionality
   useEffect(() => {
@@ -243,6 +244,18 @@ const FeedbackSection = ({ reviews }: FeedbackSectionProps) => {
                       <p className="text-muted-foreground">
                         {displayReviews[activeReview].company}
                       </p>
+                    )}
+                    {/* Add Website Button */}
+                    {displayReviews[activeReview].websiteUrl && (
+                      <a
+                        href={displayReviews[activeReview].websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 mt-3 px-4 py-2 glass rounded-lg hover-glow transition-all duration-300 text-sm"
+                      >
+                        <ExternalLink size={14} />
+                        View Project
+                      </a>
                     )}
                   </div>
                 </div>
